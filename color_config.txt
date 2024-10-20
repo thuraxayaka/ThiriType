@@ -1,0 +1,31 @@
+1. Background & Foreground
+
+    Lavender (#E6E6FA) as the background color for a light and airy feel.
+    Use Lilac (#C8A2C8) for larger sections like cards or containers.
+    Amethyst (#9966CC) can serve as the primary text color for its rich contrast on light backgrounds.
+
+2. Buttons & CTAs
+
+    For buttons, use Magenta (#FF00FF) for Call-to-Action (CTA) buttons or important interactive elements.
+    Use Hot Pink (#FF69B4) for hover states or as an accent to make the buttons stand out even more.
+    Pair it with Rose Quartz (#F7CAC9) for the text on buttons, or subtle borders around the button.
+
+3. Typography
+
+    Use Orchid (#DA70D6) for headings and important text areas that need to stand out but still blend with the overall scheme.
+    For secondary text (like subheadings or smaller labels), go with Lilac (#C8A2C8) to keep a soft touch but maintain readability.
+
+4. Borders & Dividers
+
+    Light colors like Rose Quartz (#F7CAC9) can be used for subtle dividers or thin borders between sections.
+    Amethyst (#9966CC) for more prominent dividers or border effects between key sections.
+
+5. Icons & Illustrations
+
+    Use Hot Pink (#FF69B4) and Orchid (#DA70D6) for icons, especially in contrast against lighter background colors like Lavender (#E6E6FA).
+    Shadows or subtle gradients with Amethyst (#9966CC) to add depth to illustrations or decorative elements.
+
+6. Gradients
+
+    You can blend Magenta (#FF00FF) and Orchid (#DA70D6) for gradient backgrounds or buttons to give a dynamic, vibrant feel.
+    A gradient from Lavender (#E6E6FA) to Lilac (#C8A2C8) can be used for backgrounds of cards or banners.
