@@ -105,94 +105,90 @@
     
 </template>
 <script>
+import {ref, onMounted} from 'vue';
 
 export default {
-    name: 'Menu',
-    emits: ['getSelectedTime', 'getSelectedWord', 'getDifficulty', 'getQuoteSelected', 'getOptions'],
-  
-    data() {
-        return {
-            customBoxActive: false,
-            customWordInput: '',
-            customTimeInput: '',
-            timeout: null,
-            timeOption: 0,
-            wordOption: 0
-
-        }
-    },
-    mounted() {
-  
-        this.handleSelectedWord(this.word_constant);
-        this.handleSelectedTime(this.time_constant);
-      
-    },
-   
     props: ['selectedMenuOption','number','symbol','time_constant','word_constant','difficulty'],
-    methods: {
-        selectedTime(t = 60) {
-            this.$emit('getSelectedTime',{option:'time',time:t}); 
+    emits: ['getSelectedTime', 'getSelectedWord', 'getDifficulty', 'getQuoteSelected', 'getOptions'],
+    setup(props,{emit}) {
+        const customBoxActive = ref(false);
+        const customWordInput = ref('');
+        const customTimeInput = ref('');
+        const timeout = ref(null);
+        const timeOption = ref(0);
+        const wordOption = ref(0);
+        
+        onMounted(() => {
+            handleSelectedWord(props.word_constant);
+            handleSelectedTime(props.time_constant);
+        }) 
+
+        const selectedTime = (t = 60) => {
+            emit('getSelectedTime',{option:'time',time:t}); 
             
-        },
-        selectedWord(n = 100) {
-            this.$emit('getSelectedWord',{option: 'word',count: n});
-        },
-        handleOptionsSelect(option) {
-            this.$emit('getOptions',option);
-        },
-        selectedDifficulty(difficulty) {
-            this.$emit('getDifficulty',{option:'difficulty',difficulty})
-        },
-        selectedQuote() {
-            this.$emit('getQuoteSelected','quote')
-        },
-        handleSelectedTime(t = null) {
-            if(t !== null) this.selectedTime(t); 
+        };
+        const selectedWord = (n = 100) => {
+            emit('getSelectedWord',{option: 'word',count: n});
+        };
+        const handleOptionsSelect = (option) =>{
+            emit('getOptions',option);
+        };
+        const selectedDifficulty = (difficulty) =>{
+            emit('getDifficulty',{option:'difficulty',difficulty})
+        };
+        const selectedQuote = () => {
+            emit('getQuoteSelected','quote')
+        };
+        const handleSelectedTime = (t  = null) => {
+            if(t !== null) selectedTime(t); 
             if(t == 30) {
-                this.timeOption = 1;
+                timeOption.value = 1;
             }
             else if(t == 60) {
-                this.timeOption = 2;
+                timeOption.value = 2;
                
             }
             else if(t == 90) {
-                this.timeOption = 3; 
+                timeOption.value = 3; 
             }
             else {
-                this.timeOption = 4;
-                this.customBoxActive = !this.customBoxActive;
+                timeOption.value = 4;
+                customBoxActive.value = !customBoxActive.value;
             }    
-        },
-        handleSelectedWord(n = null) {
-            if(n !== null) this.selectedWord(n); 
+        };
+        const handleSelectedWord = (n  = null) => {
+            if(n !== null) selectedWord(n); 
             if(n == 50) {
-                this.wordOption = 1;
+                wordOption.value = 1;
             }
             else if(n == 100) {
-                this.wordOption = 2;
+                wordOption.value = 2;
                
             }
             else if(n == 150) {
-                this.wordOption = 3; 
+                wordOption.value = 3; 
             }
             else {
-                this.wordOption = 4;
-                this.customBoxActive = !this.customBoxActive;
+                wordOption.value = 4;
+                customBoxActive.value = !customBoxActive.value;
             }    
-        },
-        handleTimeInput(e) {
-            this.selectedTime(parseInt(this.customTimeInput));
-            
-            this.customTimeInput = '';   
-            // this.customBoxActive = !this.customBoxActive;
-        },
-        handleWordInput(e) {
-            this.selectedWord(parseInt(this.customWordInput));
-           
-            this.customWordInput = ''; 
-            // this.customBoxActive = !this.customBoxActive;  
+        };
+        const handleTimeInput = (e) =>  {
+            selectedTime(parseInt(customTimeInput.value));
+            customTimeInput.value = '';   
+        };
+        const handleWordInput = (e) => {
+            selectedWord(parseInt(customWordInput.value));
+            customWordInput.value = ''; 
+        };
+
+        return {
+            customBoxActive,customWordInput,customTimeInput,timeout,timeOption,wordOption,
+            handleWordInput,handleTimeInput,selectedTime,selectedDifficulty,selectedQuote,
+            selectedWord,handleOptionsSelect,handleSelectedWord,handleSelectedTime
         }
-    }
+    },
+  
 }
 </script>
 <style lang="scss" scoped>

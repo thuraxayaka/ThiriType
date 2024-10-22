@@ -3,10 +3,9 @@
 </template>
 <script>
     export default {
-        data() {
-
-        },
-        props: [],
+       setup(props) {
+        
+       }
 
     }
 </script>
