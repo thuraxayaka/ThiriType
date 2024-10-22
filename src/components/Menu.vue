@@ -102,7 +102,7 @@
             </div>
         </div>
     </div>
-    
+    {{ number }} {{symbol}} {{ selectedMenuOption }}
 </template>
 <script>
 import {ref, onMounted} from 'vue';
@@ -185,7 +185,7 @@ export default {
         return {
             customBoxActive,customWordInput,customTimeInput,timeout,timeOption,wordOption,
             handleWordInput,handleTimeInput,selectedTime,selectedDifficulty,selectedQuote,
-            selectedWord,handleOptionsSelect,handleSelectedWord,handleSelectedTime
+            selectedWord,handleOptionsSelect,handleSelectedWord,handleSelectedTime,...props
         }
     },
   

@@ -2,10 +2,13 @@
     
 </template>
 <script>
+    import {ref,reactive} from 'vue';
     export default {
-       setup(props) {
-        
-       }
+        props: [],
+        setup(props) {
+
+            return {};
+        }
 
     }
 </script>

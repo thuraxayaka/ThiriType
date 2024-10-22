@@ -219,6 +219,7 @@ export default {
     }
 
     const handleSelectedOption = (data) => {
+        console.log(data);
         selectedMenuOption.value = data;
     }
 
