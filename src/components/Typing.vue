@@ -4,7 +4,7 @@
         @getSelectedTime="handleSelectedTime"
         @getSelectedWord="handleSelectedWord"
         @getDifficulty="handleDifficulty"
-        @getQuoteSelected="handleQouteSelected"
+        @getQuoteSelected="handleQuoteSelected"
         @getOptions="handleSelectedOption"
         :symbol="symbol" 
         :number="number" 
@@ -17,7 +17,7 @@
         <span class="time">{{ formattedTime }}</span> 
     </div>
     <div class="words flex flex-wrap items-start gap-6" @click="focusInput">
-        <div v-for="(word,idx) in words" :ref="`word${idx}`" :key="word" :class='getWordClassName(word,idx)'>
+        <div v-for="(word,idx) in words" :ref="(el) => wordsRef[idx] = el" :key="word" :class='getWordClassName(word,idx)'>
             <span v-for="(char,i) in word" :key="i" :class="getCharacterClassName(word,idx,char,i)">{{char}}</span>
             <span v-for="(char,index) in displayExtraCharacter(word,idx)" :class="getExtraCharacterClassName(idx,index,word)">{{ char }}</span>
         </div>
@@ -30,226 +30,222 @@
         />
     </div>
     
+
+   
   
     
 </template>
 
 <script>
+import {ref,reactive,watch,computed} from 'vue';
 import { generateWords } from '@/utils/GenerateWords';
 import Menu from './Menu.vue';
 
+
+
 export default {
-    name: "Typing",
-    components: {Menu},
-    mounted() {
-        this.focusInput();
+    components: {
+        Menu
     },
-    data() {
-        return {
-            userInput: '',
-            currentWordIndex : 0,
-            currentCharIndex : -1,
-            currentChar: null,
-            currentRef: null,
+    setup() {
+    const userInput = ref('');
+    const currentWordIndex = ref(0);
+    const currentCharIndex = ref(-1);
+    const currentChar = ref(null);
+    const currentRef = ref(null);
+    const inputRef = ref(null);
+    const wordsRef = ref([]);
 
-            wpmKeyStroke: 0,
-            rawKeyStroke: 0,
-            wpmHistory: {},
-            wpm: 0,
-            rawWpm: 0,
-            prevErrorCount:0,
+    const wpmKeyStroke = ref(0);
+    const rawKeyStroke = ref(0);
+    let wpmHistory = reactive({});
+    const wpm = ref(0);
+    const rawWpm = ref(0);
+    const prevErrorCount = ref(0);
 
-            shouldGenerateNewWords: false,
-            charHistory:{},
-            wordHistory: {},
-            correctWords: {},
-            errorWords: {},
-            extraChars: {},
+    const shouldGenerateNewWords = ref(false);
+    let charHistory = reactive({});
+    let wordHistory = reactive({});
+    let correctWords = reactive({});
+    let errorWords = reactive({});
+    let extraChars = reactive({});
 
-            symbol: false,
-            number: false,
+    const symbol = ref(false);
+    const number = ref(false);
 
-            charStats: {},
-            status: '',
-            intervalId: null,
-            currentTime: null,
-            
-            selectedMenuOption: 'time',
-            time_constant: 60,
-            word_constant: 50,
-            difficulty: 'normal'
-        }
-    },
-    watch: {
-        currentWordIndex(newIndex,oldIndex) { // scroll as user types
-            if(this.status === 'started') {
-                const prevEle = this.$refs[`word${oldIndex}`][0];
-                const nextEle = this.$refs[`word${newIndex}`][0];
-                const prevWordOffset =prevEle.offsetLeft;
-                const nextWordOffset =nextEle.offsetLeft;
-                if(prevWordOffset > nextWordOffset) {
-                    prevEle.scrollIntoView();
-                }
+    
+    const status = ref('');
+    const intervalId = ref(null);
+    const currentTime = ref(null);
 
+    const selectedMenuOption = ref('time');
+    const time_constant = ref(60);
+    const word_constant = ref(50);
+    const difficulty = ref('normal');
+
+
+    //Computed Values
+    const words = computed(() => generateWords(50,number.value,symbol.value).map((word) => word.val));
+    const formattedTime = computed(() => {
+        const hour = Math.floor(currentTime.value / 3600);
+        const min = Math.floor((currentTime.value % 3600)/60);
+        const sec = Math.floor((currentTime.value % 3600)%60);
+        if(!hour && !min) return sec;
+        else if(!hour && min)   return sec < 10 ? `${min}:0${sec}`: `${min}:${sec}`;
+        else {
+            if(min < 10) {
+                if(sec < 10)  return `${hour}:0${min}:0${sec}`;
+                else return `${hour}:0${min}:${sec}`;
+            }else {
+                if(sec < 10)  return `${hour}:${min}:0${sec}`;
+                else return `${hour}:${min}:${sec}`;
             }
-        },
-       
-       
-        currentTime(newVal,oldVal) {
-            if(this.status === 'started') {
-                if(this.wpmKeyStroke === 0) {
+        }
+    });
+
+    const charStats = computed(() => {
+        const correctCount = Object.values(charHistory).filter((value) => value === true).length;
+        const incorrectCount = Object.values(charHistory).filter((value) => value === false).length;
+        const missingCharCount = Object.values(charHistory).filter((key) => key === undefined).length;
+        const extraCharCount = Object.values(extraChars).reduce((sum,count) =>  sum + count,0);
+        const accuracy = correctCount === 0 ? 0 : Math.floor((correctCount / (correctCount+incorrectCount+missingCharCount)) * 100);
+        return {correct:correctCount,incorrect: incorrectCount,missing: missingCharCount,extra : extraCharCount,accuracy };
+    });
+
+
+    //watch 
+    //TODO:to change this
+    watch(currentWordIndex,(newIndex,oldIndex) => {
+        if(status.value === 'started') {
+            const prevEle = wordsRef.value[oldIndex];
+            const nextEle = wordsRef.value[newIndex];
+            const prevWordOffset =prevEle.offsetLeft;
+            const nextWordOffset =nextEle.offsetLeft;
+            if(prevWordOffset > nextWordOffset) {
+                prevEle.scrollIntoView();
+            }
+
+        }
+    })
+
+
+    watch(currentTime,(newVal,oldVal) => {
+        if(status.value === 'started') {
+                if(wpmKeyStroke.value === 0) {
                     return;
                 }
-                this.calculateWpm();
+                calculateWpm();
             }
-        },
-        userInput(newVal,oldVal) {
-            if(this.status  === 'finished') return;
-            this.wordHistory[this.currentWordIndex] = newVal.trim();
-        },  
-        time_constant() {
-            this.restart();
-        },
-        word_constant() {
-            this.restart();
-        },
-        difficulty() {
-            this.restart();
-        },
-        words() {
-            this.restart();
-        },
+    })
 
+    watch([time_constant,word_constant,difficulty,words],() => {
+        restart();
+    })
+
+    watch(userInput,(newVal,oldVal) => {
+        if(status.value  === 'finished') return;
+        wordHistory[currentWordIndex.value] = newVal.trim();
+    })
+    //methods 
+
+    const start = () => {
+        if(status.value !== 'started') status.value = 'started';
         
+        timerCounter();
+    }
 
-    },
-    computed: {
-        words() {
-            return generateWords(50,this.number,this.symbol).map((word) =>  word.val);
-        },
-        formattedTime() {
-            const hour = Math.floor(this.currentTime / 3600);
-            const min = Math.floor((this.currentTime % 3600)/60);
-            const sec = Math.floor((this.currentTime % 3600)%60);
-            if(!hour && !min) return sec;
-            else if(!hour && min)   return sec < 10 ? `${min}:0${sec}`: `${min}:${sec}`;
-            else {
-                if(min < 10) {
-                    if(sec < 10)  return `${hour}:0${min}:0${sec}`;
-                    else return `${hour}:0${min}:${sec}`;
-                }else {
-                    if(sec < 10)  return `${hour}:${min}:0${sec}`;
-                    else return `${hour}:${min}:${sec}`;
-                }
+    const finish = () => {
+        status.value = 'finished';
+    }
+
+    const restart = () => {
+        status.value = '';
+        currentChar.value = null;
+        currentCharIndex.value = -1;
+        currentWordIndex.value = 0;
+        userInput.value = '';
+        currentRef.value = null;
+        wordHistory = {};
+        charHistory = {};
+        errorWords = {};
+        extraChars= {};
+        correctWords = {};
+        clearInterval(intervalId.value);
+        currentTime.value = null;
+        wordsRef.value[0].scrollIntoView();
+        focusInput();
+    }
+
+    const timerCounter = () => {
+        currentTime.value =  time_constant.value;
+        intervalId.value = setInterval(() => {
+            if(currentTime.value === 0) {
+                finish();
+                clearInterval(intervalId.value);
+                return;
             }
-        },
-        correctCharCount() {
-            return Object.values(this.charHistory).filter((value) => value === true).length;
-        },
-        incorrectCharCount() {
-            return  Object.values(this.charHistory).filter((value) => value === false).length;
-        },
-        missingCharCount() {
-            return Object.values(this.charHistory).filter((key) => key === undefined).length;
-        },
-        extraCharCount() {
-            return Object.values(this.extraChars).reduce((sum,count) =>  sum + count,0);
-        }
-    },
-    methods: {
-        start() {
-            if(this.status !== 'started') {
-                this.status = 'started';
-            }
-            this.timerCounter();
-        },
-        finish() {
-            this.status = 'finished';
+            currentTime.value--;
+        },1000);
+    }
 
-            // this.calculateWpm();
-        },
-        calculateWpm() {
-           
-            const passingTime = this.time_constant - this.currentTime; //passing time in sec
+    const calculateWpm = () => {
+        const passingTime = time_constant.value - currentTime.value; //passing time in sec
 
-            if(passingTime === 0 ) return;
+        if(passingTime === 0 ) return;
 
-            const totalCharTyped =  Object.keys(this.charHistory).length;
-            
-            const rawWpm = Math.floor(((totalCharTyped/5)*60) / passingTime);
-            const realWpm =  Math.floor(((this.correctCharCount/5) * 60) / passingTime);
-            const accuracy = this.correctCharCount === 0 ? 0 : Math.floor((this.correctCharCount / (this.correctCharCount+this.incorrectCharCount+this.extraCharCount)) * 100);
-            const errors = (this.incorrectCharCount + this.missingCharCount + this.extraCharCount) - this.prevErrorCount;
-            this.prevErrorCount += errors;
+        const totalCharTyped =  Object.keys(charHistory).length;
 
-            this.wpm = realWpm;
-            this.rawWpm = rawWpm;
-            this.wpmHistory[passingTime] = {wpm: realWpm,raw: rawWpm,errors};
-           
-            this.charStats = {accuracy,correctCharCount: this.correctCharCount, incorrectCharCount: this.incorrectCharCount, missingCharCount: this.missingCharCount,extraCharCount : this.extraCharCount};
-            
-        },
-        restart() {
-            this.status = '';
-            this.currentChar = null;
-            this.currentCharIndex = -1;
-            this.currentWordIndex = 0;
-            this.userInput = '';
-            this.currentRef = null;
-            this.wordHistory = {};
-            this.charHistory = {};
-            this.errorWords = {};
-            this.extraChars= {};
-            this.correctWords = {};
-            clearInterval(this.intervalId);
-            this.currentTime = null;
-            this.$refs[`word${0}`][0].scrollIntoView();
-            this.focusInput();
-        },
-        timerCounter() {
-            this.currentTime = this.time_constant;
-            this.intervalId = setInterval(() => {
-                if(this.currentTime === 0) {
-                    this.finish();
-                    clearInterval(this.intervalId);
-                    return;
-                }
-                this.currentTime--;
-            },1000)
-        },
-        handleSelectedTime(data) {
-            this.selectedMenuOption = data.option;
-            this.time_constant = data.time;
-        },
-        handleSelectedWord(data) {
-            this.selectedMenuOption = data.option;
-            this.word_constant = data.count;
-        },
-        handleSelectedOption(data) {
-            this.number = data.number;
-            this.symbol  = data.symbol;
-        },
-        handleQouteSelected(data) {
-            this.selectedMenuOption = data;
-        },
-        handleDifficulty(data) {
-            this.selectedMenuOption = data.option;
-            this.difficulty = data.difficulty;
-        },
-        handleKeyUp(e) {
+        const raw = Math.floor(((totalCharTyped/5)*60) / passingTime);
+        const realWpm =  Math.floor(((charStats.correct/5) * 60) / passingTime);
+       
+        const errors = (charStats.incorrect + charStats.missing+ charStats.extra) - prevErrorCount.value;
+        prevErrorCount.value += errors;
 
-        },
-        handleKeyDown(e) {
-            if(this.status === 'finished') {
+        wpm.value = realWpm;
+        rawWpm.value = raw;
+        wpmHistory[passingTime] = {wpm: realWpm,raw: rawWpm,errors};
+
+       
+    }
+
+    const handleSelectedTime = (data) => {
+        selectedMenuOption.value = data.option;
+        time_constant.value = data.time;
+    }
+
+    const handleSelectedWord = (data) => {
+        selectedMenuOption.value = data.option;
+        word_constant.value = data.count;
+    }
+
+    const handleSelectedOption = (data) => {
+        selectedMenuOption.value = data;
+    }
+
+    const handleQuoteSelected = (data) => {
+        selectedMenuOption.value = data;
+    }
+
+    const handleDifficulty = (data) => {
+        selectedMenuOption.value = data.option;
+        difficulty.value = data.difficulty;
+    }
+
+    const handleKeyUp = (e) => {
+
+    }
+
+    const handleKeyDown = (e) => {
+        if(status.value === 'finished') {
                 return;
             }
             const key = e.key;
             const keyCode = e.keyCode;
             
-            if(this.status !== 'started'
-            && this.status !== 'finished'
+            if(status.value !== 'started'
+            && status.value !== 'finished'
             ) {
-                this.start();
+                start();
             }
             
           
@@ -277,185 +273,189 @@ export default {
             
             //handle backspace
             if(keyCode === 8) {
-                const keyString = this.currentWordIndex + "." + this.currentCharIndex;
-                let prevWord = this.wordHistory[this.currentWordIndex-1] || '' ;
-                if(this.currentCharIndex < 0) { //prevent overdeleting
-                    if(this.currentWordIndex-1 in this.errorWords) {
+                const keyString = currentWordIndex.value + "." + currentCharIndex.value;
+                let prevWord = wordHistory[currentWordIndex.value-1] || '' ;
+                if(currentCharIndex.value < 0) { //prevent overdeleting
+                    if(currentWordIndex.value-1 in errorWords) {
                       
                         
-                        this.currentWordIndex--;
-                        this.currentChar='';
-                        this.currentCharIndex= prevWord.length-1;
-                        this.userInput = prevWord + " ";
+                        currentWordIndex.value--;
+                        currentChar.value='';
+                        currentCharIndex.value= prevWord.length-1;
+                        userInput.value = prevWord + " ";
                        
                     }
 
                     return;
                 }
                 
-                this.currentCharIndex--;
-                delete this.charHistory[keyString];
+                currentCharIndex.value--;
+                delete charHistory[keyString];
                 
-                this.currentChar='';
+                currentChar.value='';
                 return;
             }
 
             //handle space
             if(keyCode === 32) {
-                if(this.currentCharIndex === -1) {
+                if(currentCharIndex.value === -1) {
                     return;
                 }
-                const isPrevWordCorrect = this.checkPrevWords();
+                const isPrevWordCorrect = checkPrevWords();
                 
                 if(isPrevWordCorrect) {
-                    this.userInput = '';                    
-                    this.currentChar = "";
+                    userInput.value = '';                    
+                    currentChar.value = "";
                 }
-                this.currentCharIndex=-1;
-                this.currentWordIndex++;
+                currentCharIndex.value=-1;
+                currentWordIndex.value++;
                 return;
             }
 
-            if(this.status === 'started') {
-                this.rawKeyStroke++;
+            if(status.value === 'started') {
+                rawKeyStroke.value++;
                 if(keyCode >= 65 && keyCode <= 90) {
-                    this.wpmKeyStroke++;
+                    wpmKeyStroke.value++;
                 }
 
             }
 
-            this.currentCharIndex = this.currentCharIndex+1;
-            this.currentChar = key;
+            currentCharIndex.value = currentCharIndex.value+1;
+            currentChar.value = key;
+    }
 
-        },
-        checkPrevWords() {
-            this.wpmKeyStroke++;
-            const correctWord = this.words[this.currentWordIndex];
-            const userTypedWord = this.userInput.trim();
-            const isCorrect = correctWord === userTypedWord;
-            this.wordHistory[this.currentWordIndex] = userTypedWord;
-            if(isCorrect && userTypedWord.length === correctWord.length) {
-                this.correctWords[this.currentWordIndex] = true;
-                
-                if(this.currentWordIndex in this.errorWords) {
-                    delete this.errorWords[this.currentWordIndex];
-                }
-                this.userInput = '';
-                return true;
-            }
+    const checkPrevWords = () => {
+        wpmKeyStroke.value++;
+        const correctWord = words[currentWordIndex.value];
+        const userTypedWord = userInput.value.trim();
+        const isCorrect = correctWord === userTypedWord;
+        wordHistory[currentWordIndex.value] = userTypedWord;
+        if(isCorrect && userTypedWord.length === correctWord.length) {
+            correctWords[currentWordIndex.value] = true;
             
-            if(this.currentWordIndex in this.correctWords) {
-                delete this.correctWords[this.currentWordIndex];
+            if(currentWordIndex.value in errorWords) {
+                delete errorWords[currentWordIndex.value];
             }
-            this.errorWords[this.currentWordIndex] = false;
-            this.userInput = '';
-            return false;
+            userInput.value = '';
+            return true;
+        }
+        
+        if(currentWordIndex.value in correctWords) {
+            delete correctWords[currentWordIndex.value];
+        }
+        errorWords[currentWordIndex.value] = false;
+        userInput.value = '';
+        return false;
+    }
 
-        },
-        focusInput() {
-            this.$refs.inputRef.focus();
-        },
-        getWordClassName(word,wordIdx) {
-            if(wordIdx === this.currentWordIndex) return 'word active-word flex items-center gap-1'
+    const focusInput = () => {
+        inputRef.value.focus();
+    }
+
+    const getWordClassName = (word,wordIdx) => {
+        if(wordIdx === currentWordIndex.value) return 'word active-word flex items-center gap-1'
             
-            if(wordIdx in this.wordHistory) {
-                if(word !== this.wordHistory[wordIdx]) return 'word error-word flex items-center gap-1';    
-            }
-            return 'word flex items-center gap-1'
-        },
-        getCharacterClassName(word,wordIdx,char,charIdx) {
-           let keyString = wordIdx + "." + charIdx;
+        if(wordIdx in wordHistory) {
+            if(word !== wordHistory[wordIdx]) return 'word error-word flex items-center gap-1';    
+        }
+        return 'word flex items-center gap-1'
+    }
+
+    const getCharacterClassName = (word,wordIdx,char,charIdx) => {
+        let keyString = wordIdx + "." + charIdx;
           
-           if(wordIdx === this.currentWordIndex  &&
-            this.currentCharIndex+1 === charIdx
-            && this.currentCharIndex+1 !== word.length)
-            {
-             return "caret-left char"; 
-           }
-           
-           if(this.charHistory[keyString] === true) {
+        if(wordIdx === currentWordIndex.value  &&
+        currentCharIndex.value+1 === charIdx
+        && currentCharIndex.value+1 !== word.length)
+        {
+        return "caret-left char"; 
+        }
+        
+        if(charHistory[keyString] === true) {
+        
+        if(currentCharIndex.value === word.length-1
+            &&
+            currentCharIndex.value === charIdx
+            && 
+            currentWordIndex.value === wordIdx
+        ) {
+            return ' char caret-right correct-char';
+        }
+        return 'correct-char char';
+        }
+        if(charHistory[keyString] === false) {
+        if(currentCharIndex.value === word.length-1 
+            &&
+            currentWordIndex.value === wordIdx
+            && 
+            currentCharIndex.value === charIdx
+        ) {
+            return 'char caret-right error-char';
+        }
+        return 'error-char char';
+        }
+    
+        if(currentCharIndex.value === charIdx 
+            && currentWordIndex.value === wordIdx
+            && currentChar.value
+            ) {
             
-            if(this.currentCharIndex === word.length-1
-                &&
-                this.currentCharIndex === charIdx
-                && 
-                this.currentWordIndex === wordIdx
-            ) {
-                return ' char caret-right correct-char';
-            }
-            return 'correct-char char';
-           }
-           if(this.charHistory[keyString] === false) {
-            if(this.currentCharIndex === word.length-1 
-                &&
-                this.currentWordIndex === wordIdx
-                && 
-                this.currentCharIndex === charIdx
-            ) {
-                return 'char caret-right error-char';
-            }
-            return 'error-char char';
-           }
-      
-        if(this.currentCharIndex === charIdx 
-           && this.currentWordIndex === wordIdx
-           && this.currentChar
-           ) {
-             
-                if(this.currentChar === char) {
-                    this.charHistory[keyString] = true;
+                if(currentChar.value === char) {
+                    charHistory[keyString] = true;
                     return 'correct-char char';
                 }else {
-                    this.charHistory[keyString] = false;
+                    charHistory[keyString] = false;
                     return 'error-char char';
                 }   
         }else {
-            if(wordIdx < this.currentWordIndex) {
-                this.charHistory[keyString] = undefined;
+            if(wordIdx < currentWordIndex.value) {
+                charHistory[keyString] = undefined;
             }
         }
-      
+    
         return 'char';
-           
-          
-           
-           
-           
-        },
-        getExtraCharacterClassName(wordIdx,extraIdx,word) {
-            let input = this.wordHistory[wordIdx];
-            if(!input) input = this.userInput.trim();
-            if(wordIdx > this.currentWordIndex) return null;
+         
+    }
 
-            const extraChars = input.substring(word.length);
-            if(wordIdx === this.currentWordIndex) {
-                if(extraIdx === extraChars.length-1) return 'error-char char caret-right';
-            }
+    const getExtraCharacterClassName = (wordIdx,extraIdx,word) => {
+        let input = wordHistory[wordIdx];
+        if(!input) input = userInput.value.trim();
+        if(wordIdx >currentWordIndex.value) return null;
+
+        const extraChars = input.substring(word.length);
+        if(wordIdx === currentWordIndex.value) {
+            if(extraIdx === extraChars.length-1) return 'error-char char caret-right';
+        }
 
 
-            return 'error-char char'
-        },
-        displayExtraCharacter(word,wordIdx) {
-            
-            let curInput = this.wordHistory[wordIdx];
-            if(!curInput) curInput = this.userInput.trim();
-            if(wordIdx > this.currentWordIndex) {
-                return null;
-            }
-           
-          
-            if(curInput.length <= word.length) {
-                return null;
-            }else {
-
-                const extraWords = curInput.substring(word.length);
-                this.extraChars[wordIdx] = extraWords.length;
-                return extraWords.split('');
-            }
-            
-            
-        },
+        return 'error-char char'
+    }
+    
+    const displayExtraCharacter = (word,wordIdx) => {
+        let curInput = wordHistory[wordIdx];
+        if(!curInput) curInput = userInput.value.trim();
+        if(wordIdx > currentWordIndex.value) {
+            return null;
+        }
         
+        
+        if(curInput.length <= word.length) {
+            return null;
+        }else {
+            const extraWords = curInput.substring(word.length);
+            extraChars[wordIdx] = extraWords.length;
+            return extraWords.split('');
+        }
+    }
+    return {
+        userInput,status,symbol,number,selectedMenuOption,time_constant,word_constant,difficulty,
+        words,formattedTime,charStats,handleDifficulty,handleQuoteSelected,handleSelectedOption,
+        handleSelectedWord,handleSelectedTime,handleKeyUp,handleKeyDown,
+        inputRef,focusInput,getWordClassName,getCharacterClassName,getExtraCharacterClassName,
+        displayExtraCharacter,wordsRef
+
+    }
+    
     }
 }
 </script>
