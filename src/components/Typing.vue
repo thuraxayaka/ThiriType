@@ -16,7 +16,7 @@
     <div :class="['counter',status === 'started' ? 'active' : '']">
         <span class="time">{{ formattedTime }}</span> 
     </div>
-    <div class="words flex flex-wrap items-start gap-4" @click="focusInput">
+    <div class="words flex flex-wrap items-start gap-6" @click="focusInput">
         <div v-for="(word,idx) in words" :ref="`word${idx}`" :key="word" :class='getWordClassName(word,idx)'>
             <span v-for="(char,i) in word" :key="i" :class="getCharacterClassName(word,idx,char,i)">{{char}}</span>
             <span v-for="(char,index) in displayExtraCharacter(word,idx)" :class="getExtraCharacterClassName(idx,index,word)">{{ char }}</span>
@@ -30,7 +30,7 @@
         />
     </div>
     
-    
+  
     
 </template>
 
@@ -51,19 +51,25 @@ export default {
             currentCharIndex : -1,
             currentChar: null,
             currentRef: null,
+
             wpmKeyStroke: 0,
             rawKeyStroke: 0,
-            keyStrokeHistory: {},
+            wpmHistory: {},
+            wpm: 0,
+            rawWpm: 0,
+            prevErrorCount:0,
 
+            shouldGenerateNewWords: false,
             charHistory:{},
             wordHistory: {},
             correctWords: {},
             errorWords: {},
             extraChars: {},
-            
+
             symbol: false,
             number: false,
 
+            charStats: {},
             status: '',
             intervalId: null,
             currentTime: null,
@@ -87,6 +93,16 @@ export default {
 
             }
         },
+       
+       
+        currentTime(newVal,oldVal) {
+            if(this.status === 'started') {
+                if(this.wpmKeyStroke === 0) {
+                    return;
+                }
+                this.calculateWpm();
+            }
+        },
         userInput(newVal,oldVal) {
             if(this.status  === 'finished') return;
             this.wordHistory[this.currentWordIndex] = newVal.trim();
@@ -102,7 +118,8 @@ export default {
         },
         words() {
             this.restart();
-        }
+        },
+
         
 
     },
@@ -125,6 +142,18 @@ export default {
                     else return `${hour}:${min}:${sec}`;
                 }
             }
+        },
+        correctCharCount() {
+            return Object.values(this.charHistory).filter((value) => value === true).length;
+        },
+        incorrectCharCount() {
+            return  Object.values(this.charHistory).filter((value) => value === false).length;
+        },
+        missingCharCount() {
+            return Object.values(this.charHistory).filter((key) => key === undefined).length;
+        },
+        extraCharCount() {
+            return Object.values(this.extraChars).reduce((sum,count) =>  sum + count,0);
         }
     },
     methods: {
@@ -137,21 +166,27 @@ export default {
         finish() {
             this.status = 'finished';
 
-            this.calculateWpm();
+            // this.calculateWpm();
         },
         calculateWpm() {
-            const totalCharTyped = Object.keys(this.charHistory).length;
-            const correctCharCount = Object.values(this.charHistory).filter((value) => value === true).length;
-            const incorrectCharCount = Object.values(this.charHistory).filter((value) => value === false).length;
-            const missingCharCount = Object.values(this.charHistory).filter((key) => key === undefined).length;
-            const extraCharCount = Object.values(this.extraChars).reduce((sum,count) =>  sum + count,0);
-          
-            const passingTime = this.time_constant - this.currentTime; //passing time in sec
-         
-            const rawWpm = Math.floor(((totalCharTyped/5)*60) / passingTime);
-            const realWpm = Math.floor(((correctCharCount/5) * 60) / passingTime);
-            const accuracy = Math.floor((correctCharCount / (correctCharCount+incorrectCharCount+extraCharCount)) * 100);
            
+            const passingTime = this.time_constant - this.currentTime; //passing time in sec
+
+            if(passingTime === 0 ) return;
+
+            const totalCharTyped =  Object.keys(this.charHistory).length;
+            
+            const rawWpm = Math.floor(((totalCharTyped/5)*60) / passingTime);
+            const realWpm =  Math.floor(((this.correctCharCount/5) * 60) / passingTime);
+            const accuracy = this.correctCharCount === 0 ? 0 : Math.floor((this.correctCharCount / (this.correctCharCount+this.incorrectCharCount+this.extraCharCount)) * 100);
+            const errors = (this.incorrectCharCount + this.missingCharCount + this.extraCharCount) - this.prevErrorCount;
+            this.prevErrorCount += errors;
+
+            this.wpm = realWpm;
+            this.rawWpm = rawWpm;
+            this.wpmHistory[passingTime] = {wpm: realWpm,raw: rawWpm,errors};
+           
+            this.charStats = {accuracy,correctCharCount: this.correctCharCount, incorrectCharCount: this.incorrectCharCount, missingCharCount: this.missingCharCount,extraCharCount : this.extraCharCount};
             
         },
         restart() {
@@ -217,9 +252,7 @@ export default {
                 this.start();
             }
             
-            if(keyCode>=65 && keyCode <= 90) {
-                
-            }
+          
             //handle esc
             if(keyCode === 27) {
                 return;
@@ -457,11 +490,12 @@ export default {
         position: realtive;
         border-radius: 12px;
         // background: #F0F0F0;
-        height: 180px;
+        height: 210px;
         overflow: hidden;
         font-family: $Font;
-        font-size: 1.8em;
+        font-size: 2em;
         padding: 20px;
+        
         letter-spacing: -0.1em;
         .word{
             color: $Lilac;

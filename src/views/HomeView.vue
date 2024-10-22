@@ -4,7 +4,7 @@
       <Header/>
     </div>
     <div className="mt-40">
-      <Typing/>
+      <TypingNew/>
     </div>
   </div>
 </template>
@@ -12,9 +12,10 @@
 <script>
 import Header from '@/components/Header.vue';
 import Typing from '@/components/Typing.vue';
+import TypingNew from '@/components/TypingNew.vue';
 
 export default {
   name: 'HomeView',
-  components: {Header,Typing}
+  components: {Header,Typing,TypingNew}
 }
 </script>
