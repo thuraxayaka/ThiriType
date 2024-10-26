@@ -102,10 +102,11 @@
             </div>
         </div>
     </div>
-    {{ number }} {{symbol}} {{ selectedMenuOption }}
+
+    
 </template>
 <script>
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, toRefs} from 'vue';
 
 export default {
     props: ['selectedMenuOption','number','symbol','time_constant','word_constant','difficulty'],
@@ -117,6 +118,7 @@ export default {
         const timeout = ref(null);
         const timeOption = ref(0);
         const wordOption = ref(0);
+        const {difficulty} = toRefs(props);
         
         onMounted(() => {
             handleSelectedWord(props.word_constant);
@@ -133,13 +135,14 @@ export default {
         const handleOptionsSelect = (option) =>{
             emit('getOptions',option);
         };
-        const selectedDifficulty = (difficulty) =>{
+        const selectedDifficulty = (difficulty = 'normal') =>{
             emit('getDifficulty',{option:'difficulty',difficulty})
         };
         const selectedQuote = () => {
             emit('getQuoteSelected','quote')
         };
         const handleSelectedTime = (t  = null) => {
+            customBoxActive.value = false;
             if(t !== null) selectedTime(t); 
             if(t == 30) {
                 timeOption.value = 1;
@@ -157,6 +160,7 @@ export default {
             }    
         };
         const handleSelectedWord = (n  = null) => {
+            customBoxActive.value = false;
             if(n !== null) selectedWord(n); 
             if(n == 50) {
                 wordOption.value = 1;
@@ -185,7 +189,7 @@ export default {
         return {
             customBoxActive,customWordInput,customTimeInput,timeout,timeOption,wordOption,
             handleWordInput,handleTimeInput,selectedTime,selectedDifficulty,selectedQuote,
-            selectedWord,handleOptionsSelect,handleSelectedWord,handleSelectedTime,...props
+            selectedWord,handleOptionsSelect,handleSelectedWord,handleSelectedTime,difficulty
         }
     },
   
