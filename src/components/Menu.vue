@@ -243,19 +243,19 @@ export default {
         display: flex;
         padding: 10px;
         overflow: hidden;
-        animation: appear 0.4s linear  forwards;
-        -o-animation: appear 0.4s linear  forwards;
-        -moz-animation: appear 0.4s linear  forwards;
-        -webkit-animation: appear 0.4s linear  forwards;
+        animation: appear 0.5s linear  forwards;
+        -o-animation: appear 0.5s linear  forwards;
+        -moz-animation: appear 0.5s linear  forwards;
+        -webkit-animation: appear 0.5s linear  forwards;
         
         .menu-text:hover {
             cursor: pointer;
         }
         &.hidden {
-            animation: disappear 0.1s linear  forwards;
-            -o-animation: disappear 0.1s linear  forwards;
-            -moz-animation: disappear 0.1s linear  forwards;
-            -webkit-animation: disappear 0.1s linear  forwards;
+            animation: disappear .5s linear  forwards;
+            -o-animation: disappear .5s linear  forwards;
+            -moz-animation: disappear .5s linear  forwards;
+            -webkit-animation: disappear .5s linear  forwards;
             opacity: 0;
             padding: 0;
             border-radius: 0;
