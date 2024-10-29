@@ -3,7 +3,7 @@
     <div className="mt-4">
       <Header/>
     </div>
-    <div class="lg:w-[300px] mx-auto mt-40 mb-10">
+    <div class=" mx-auto mt-40 mb-10">
         <Menu 
         @getSelectedTime="handleSelectedTime"
         @getSelectedWord="handleSelectedWord"
