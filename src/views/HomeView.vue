@@ -10,20 +10,21 @@
         @getDifficulty="handleDifficulty"
         @getQuoteSelected="handleQuoteSelected"
         @getOptions="handleSelectedOption"
-        :symbol="stateStore.symbol" 
-        :number="stateStore.number" 
-        :selectedMenuOption="stateStore.selectedMenuOption" 
-        :time_constant="stateStore.time_constant" 
-        :word_constant="stateStore.word_constant"
-        :difficulty ="stateStore.difficulty"/>
+        :symbol="symbol" 
+        :number="number" 
+        :selectedMenuOption="selectedMenuOption" 
+        :time_constant="time_constant" 
+        :word_constant="word_constant"
+        :difficulty ="difficulty"/>
     </div>
-    <div v-if="stateStore.status !== 'finished'">
+    <div v-if="status !== 'finished'">
       <Typing/>
     </div>
     <div v-else>
       <Stats/>
     </div>
   </div>
+  
 </template>
 
 <script>
@@ -31,53 +32,49 @@ import Header from '@/components/Header.vue';
 import Menu from '@/components/Menu.vue';
 import Typing from '@/components/Typing.vue';
 import Stats from '@/components/Stats.vue';
-import { useTypingStateStore } from '@/stores/store';
-import { watch } from 'vue';
+import {  useTypingStore } from '@/stores/store';
+import { toRefs, watch } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 export default {
   name: 'HomeView',
-  components: {Header,Typing,Stats,Menu},
+  components: {Header,Typing,Stats,Menu,FontAwesomeIcon},
   setup() {
-    const stateStore = useTypingStateStore();
+    const typingStore = useTypingStore();
+    const {time_constant,selectedMenuOption,symbol,number,difficulty,word_constant,status} = toRefs(typingStore);
 
     const handleSelectedTime = (data) => {
-        // stateStore.setSelectedMenu(data.option);
-        // stateStore.time_constant = data.time;
-        stateStore.$patch({time_constant: data.time,selectedMenuOption : 'time'})
+        typingStore.$patch({time_constant: data.time,selectedMenuOption : 'time'})
     }
 
     const handleSelectedWord = (data) => {
-        // stateStore.setSelectedMenu(data.option);
-        // stateStore.word_constant = data.count;
-        stateStore.$patch({selectedMenuOption: 'word',word_constant : data.count})
+        typingStore.$patch({selectedMenuOption: 'word',word_constant : data.count})
     }
 
     const handleSelectedOption = (data) => {
-        // stateStore.number = data.number;
-        // stateStore.symbol = data.symbol;
-
-        stateStore.$patch({number: data.number,symbol: data.symbol});
+        typingStore.$patch({number: data.number,symbol: data.symbol});
     }
 
     const handleQuoteSelected = (data) => {
-        stateStore.$patch({selectedMenuOption: data});
+        typingStore.$patch({selectedMenuOption: data});
     }
 
     const handleDifficulty = (data) => {
-        // stateStore.setSelectedMenu(data.option);
-        // stateStore.difficulty = data.difficulty;
-        stateStore.$patch({selectedMenuOption: data.option,difficulty: data.difficulty});
+        typingStore.$patch({selectedMenuOption: data.option,difficulty: data.difficulty});
     }
     const restart = () => {
-      stateStore.status = '';
+      typingStore.restart();  
+      
     }
-    watch([()=> stateStore.time_constant,() => stateStore.word_constant,() => stateStore.selectedMenuOption,
-      () => stateStore.symbol , () => stateStore.number, () =>  stateStore.difficulty
+    watch([()=> time_constant.value,() => word_constant.value,() => selectedMenuOption.value,
+      () => symbol.value , () => number.value, () =>  difficulty.value
     ],() => {
           restart();
     })
 
 
-    return {stateStore,handleSelectedOption,handleSelectedTime,handleDifficulty,handleQuoteSelected,handleSelectedWord}
+    return {handleSelectedOption,handleSelectedTime,handleDifficulty,handleQuoteSelected,handleSelectedWord,
+      selectedMenuOption,time_constant,word_constant,difficulty,symbol,number,status
+    }
   }
 }
 </script>
