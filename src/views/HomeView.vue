@@ -17,12 +17,6 @@
         :word_constant="word_constant"
         :difficulty="difficulty"
       />
-        :symbol="symbol" 
-        :number="number" 
-        :selectedMenuOption="selectedMenuOption" 
-        :time_constant="time_constant" 
-        :word_constant="word_constant"
-        :difficulty ="difficulty"/>
     </div>
     <div v-if="status !== 'finished'">
       <Typing />
@@ -31,20 +25,19 @@
       <Stats />
     </div>
   </div>
-  
 </template>
 
 <script>
-import Header from '@/components/Header.vue';
-import Menu from '@/components/Menu.vue';
-import Typing from '@/components/Typing.vue';
-import Stats from '@/components/Stats.vue';
-import {  useTypingStore } from '@/stores/store';
-import { toRefs, watch } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import Header from "@/components/Header.vue";
+import Menu from "@/components/Menu.vue";
+import Typing from "@/components/Typing.vue";
+import Stats from "@/components/Stats.vue";
+import { useTypingStore } from "@/stores/store";
+import { toRefs, watch } from "vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 export default {
-  name: 'HomeView',
-  components: {Header,Typing,Stats,Menu,FontAwesomeIcon},
+  name: "HomeView",
+  components: { Header, Typing, Stats, Menu, FontAwesomeIcon },
   setup() {
     const typingStore = useTypingStore();
     const {
@@ -86,15 +79,21 @@ export default {
       });
     };
     const restart = () => {
-      typingStore.restart();  
-      
-    }
-    watch([()=> time_constant.value,() => word_constant.value,() => selectedMenuOption.value,
-      () => symbol.value , () => number.value, () =>  difficulty.value
-    ],() => {
-          restart();
-    })
-
+      typingStore.restart();
+    };
+    watch(
+      [
+        () => time_constant.value,
+        () => word_constant.value,
+        () => selectedMenuOption.value,
+        () => symbol.value,
+        () => number.value,
+        () => difficulty.value,
+      ],
+      () => {
+        restart();
+      }
+    );
 
     return {
       handleSelectedOption,

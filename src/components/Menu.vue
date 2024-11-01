@@ -31,7 +31,7 @@
           :class="['menu-text', number ? 'active' : '']"
           @click="handleOptionsSelect({ symbol, number: !number })"
         >
-          <font-awesome-icon :icon="['fas', 'arrow-up-1-9']" /> numbers
+          <font-awesome-icon :icon="['fas', 'arrow-down-1-9']" /> numbers
         </span>
       </div>
     </div>
@@ -359,13 +359,14 @@ export default {
   transition: border-radius 0.2s ease-in, opacity 0.4s ease-in;
   color: white;
   font-family: $Poppins;
+  font-size: 14px;
   opacity: 0;
   &.active {
     opacity: 1;
   }
 }
 .fixed-menu {
-  padding: 10px;
+  padding: 10px 15px;
   width: max-content;
   .menu-text {
     &.active {
@@ -386,10 +387,11 @@ export default {
   -o-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
   -moz-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
   -webkit-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
-  max-width: 400px;
+  max-width: 500px;
   opacity: 1;
   display: flex;
-  padding: 10px;
+  padding: 10px 15px;
+  height: auto;
   overflow: hidden;
   animation: appear 0.5s ease-in forwards;
   -o-animation: appear 0.5s ease-in forwards;
@@ -400,12 +402,14 @@ export default {
     cursor: pointer;
   }
   &.hidden {
+    max-width: 0;
     animation: disappear 0.5s ease-out forwards;
     -o-animation: disappear 0.5s ease-out forwards;
     -moz-animation: disappear 0.5s ease-out forwards;
     -webkit-animation: disappear 0.5s ease-out forwards;
     opacity: 0;
     padding: 0;
+    height: 0;
     border-radius: 0;
   }
 }
@@ -463,26 +467,32 @@ export default {
 @-moz-keyframes appear {
   from {
     max-width: 0;
+    height: 0;
   }
   to {
-    max-width: 450px;
+    max-width: 500px;
+    height: auto;
   }
 }
 @keyframes appear {
   from {
     max-width: 0;
+    height: 0;
   }
   to {
-    max-width: 450px;
+    max-width: 500px;
+    height: auto;
   }
 }
 
 @keyframes disappear {
   to {
     max-width: 0;
+    height: 0;
   }
   from {
-    max-width: 450px;
+    max-width: 500px;
+    height: auto;
   }
 }
 @keyframes inputAppear {

@@ -145,8 +145,8 @@ export default {
         return;
       }
       if (status.value === "started") {
-        const prevEle = wordsRef.value[oldIndex];
-        const nextEle = wordsRef.value[newIndex];
+        const prevEle = wordsRef[oldIndex];
+        const nextEle = wordsRef[newIndex];
         const prevWordOffset = prevEle.offsetLeft;
         const nextWordOffset = nextEle.offsetLeft;
         if (prevWordOffset > nextWordOffset) {
@@ -229,7 +229,7 @@ export default {
 
       clearInterval(intervalId.value);
       currentTime.value = null;
-      wordsRef.value[0].scrollIntoView();
+      wordsRef[0].scrollIntoView();
       focusInput();
     };
 
@@ -417,16 +417,6 @@ export default {
       inputRef.value.focus();
     };
 
-    const getWordClassName = (word, wordIdx) => {
-      if (wordIdx === currentWordIndex.value)
-        return "word active-word flex items-center gap-1";
-
-      if (wordIdx in wordHistory) {
-        if (word !== wordHistory[wordIdx])
-          return "word error-word flex items-center gap-1";
-      }
-      return "word flex items-center gap-1";
-    };
     const getWordClassName = (word, wordIdx) => {
       if (wordIdx === currentWordIndex.value)
         return "word active-word flex items-center gap-1";
