@@ -1,15 +1,22 @@
 <template>
   <div class="lg:w-4/5 lg:mx-auto">
     <div className="mt-4">
-      <Header/>
+      <Header />
     </div>
-    <div class=" mx-auto mt-40 mb-10">
-        <Menu 
+    <div class="mx-auto mt-40 mb-10">
+      <Menu
         @getSelectedTime="handleSelectedTime"
         @getSelectedWord="handleSelectedWord"
         @getDifficulty="handleDifficulty"
         @getQuoteSelected="handleQuoteSelected"
         @getOptions="handleSelectedOption"
+        :symbol="symbol"
+        :number="number"
+        :selectedMenuOption="selectedMenuOption"
+        :time_constant="time_constant"
+        :word_constant="word_constant"
+        :difficulty="difficulty"
+      />
         :symbol="symbol" 
         :number="number" 
         :selectedMenuOption="selectedMenuOption" 
@@ -18,10 +25,10 @@
         :difficulty ="difficulty"/>
     </div>
     <div v-if="status !== 'finished'">
-      <Typing/>
+      <Typing />
     </div>
     <div v-else>
-      <Stats/>
+      <Stats />
     </div>
   </div>
   
@@ -40,27 +47,44 @@ export default {
   components: {Header,Typing,Stats,Menu,FontAwesomeIcon},
   setup() {
     const typingStore = useTypingStore();
-    const {time_constant,selectedMenuOption,symbol,number,difficulty,word_constant,status} = toRefs(typingStore);
+    const {
+      number,
+      symbol,
+      difficulty,
+      selectedMenuOption,
+      word_constant,
+      time_constant,
+      status,
+    } = toRefs(typingStore);
 
     const handleSelectedTime = (data) => {
-        typingStore.$patch({time_constant: data.time,selectedMenuOption : 'time'})
-    }
+      typingStore.$patch({
+        time_constant: data.time,
+        selectedMenuOption: "time",
+      });
+    };
 
     const handleSelectedWord = (data) => {
-        typingStore.$patch({selectedMenuOption: 'word',word_constant : data.count})
-    }
+      typingStore.$patch({
+        selectedMenuOption: "word",
+        word_constant: data.count,
+      });
+    };
 
     const handleSelectedOption = (data) => {
-        typingStore.$patch({number: data.number,symbol: data.symbol});
-    }
+      typingStore.$patch({ number: data.number, symbol: data.symbol });
+    };
 
     const handleQuoteSelected = (data) => {
-        typingStore.$patch({selectedMenuOption: data});
-    }
+      typingStore.$patch({ selectedMenuOption: data });
+    };
 
     const handleDifficulty = (data) => {
-        typingStore.$patch({selectedMenuOption: data.option,difficulty: data.difficulty});
-    }
+      typingStore.$patch({
+        selectedMenuOption: data.option,
+        difficulty: data.difficulty,
+      });
+    };
     const restart = () => {
       typingStore.restart();  
       
@@ -72,9 +96,20 @@ export default {
     })
 
 
-    return {handleSelectedOption,handleSelectedTime,handleDifficulty,handleQuoteSelected,handleSelectedWord,
-      selectedMenuOption,time_constant,word_constant,difficulty,symbol,number,status
-    }
-  }
-}
+    return {
+      handleSelectedOption,
+      handleSelectedTime,
+      handleDifficulty,
+      handleQuoteSelected,
+      handleSelectedWord,
+      symbol,
+      number,
+      difficulty,
+      selectedMenuOption,
+      word_constant,
+      time_constant,
+      status,
+    };
+  },
+};
 </script>

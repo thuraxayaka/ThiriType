@@ -28,14 +28,13 @@
     </div>
     <input
       v-model="userInput"
-      id="userInput"
+      id="userinput"
       type="text"
       ref="inputRef"
       @keydown="handleKeyDown"
       @keyup="handleKeyUp"
     />
   </div>
-  {{ wordsRef }}
 </template>
 
 <script>
@@ -142,15 +141,14 @@ export default {
     //watch
     watch(currentWordIndex, (newIndex, oldIndex) => {
       if (currentWordIndex.value === words.value.length) {
+        finish();
         return;
       }
-
       if (status.value === "started") {
-        const prevEle = wordsRef[oldIndex];
-        const nextEle = wordsRef[newIndex];
+        const prevEle = wordsRef.value[oldIndex];
+        const nextEle = wordsRef.value[newIndex];
         const prevWordOffset = prevEle.offsetLeft;
         const nextWordOffset = nextEle.offsetLeft;
-        console.log(prevEle);
         if (prevWordOffset > nextWordOffset) {
           prevEle.scrollIntoView();
         }
@@ -159,11 +157,13 @@ export default {
     watch(
       [currentWordIndex, currentCharIndex],
       ([newWordIndex, newCharIndex]) => {
-        const lastIndex = words.value.length - 1;
-        if (newWordIndex === lastIndex) {
-          const lastWord = words.value[lastIndex];
-          if (newCharIndex === lastWord.length - 1) {
-            finish();
+        if (selectedMenuOption.value === "word") {
+          const lastIndex = words.value.length - 1;
+          if (newWordIndex === lastIndex) {
+            const lastWord = words.value[lastIndex];
+            if (newCharIndex === lastWord.length - 1) {
+              finish();
+            }
           }
         }
       }
@@ -229,14 +229,12 @@ export default {
 
       clearInterval(intervalId.value);
       currentTime.value = null;
-
-      wordsRef[0].scrollIntoView();
+      wordsRef.value[0].scrollIntoView();
       focusInput();
     };
 
     const timerCounter = () => {
       if (selectedMenuOption.value === "time") {
-        console.log("here");
         currentTime.value = time_constant.value;
         intervalId.value = setInterval(() => {
           if (currentTime.value === 0) {
@@ -246,7 +244,6 @@ export default {
           currentTime.value--;
         }, 1000);
       } else if (selectedMenuOption.value === "word") {
-        console.log("word");
         currentTime.value = 0;
         intervalId.value = setInterval(() => {
           currentTime.value++;
@@ -262,7 +259,7 @@ export default {
         passingTime = currentTime.value;
       }
       if (passingTime === 0) return;
-      timePassed.value = passingTime;
+      typingStore.timePassed = passingTime;
       const totalCharTyped = Object.keys(charHistory).length;
       const raw = Math.floor(((totalCharTyped / 5) * 60) / passingTime);
       const realWpm = Math.floor(
@@ -337,7 +334,7 @@ export default {
       }
 
       //handle tabs key
-      if (keyCode === 9) {
+      if (keyCode == 9) {
         e.preventDefault();
         return;
       }
@@ -369,9 +366,6 @@ export default {
       if (keyCode === 32) {
         if (currentCharIndex.value === -1) {
           return;
-        }
-        if (currentWordIndex.value === words.value.length - 1) {
-          finish();
         }
         const isPrevWordCorrect = checkPrevWords();
 
@@ -423,6 +417,16 @@ export default {
       inputRef.value.focus();
     };
 
+    const getWordClassName = (word, wordIdx) => {
+      if (wordIdx === currentWordIndex.value)
+        return "word active-word flex items-center gap-1";
+
+      if (wordIdx in wordHistory) {
+        if (word !== wordHistory[wordIdx])
+          return "word error-word flex items-center gap-1";
+      }
+      return "word flex items-center gap-1";
+    };
     const getWordClassName = (word, wordIdx) => {
       if (wordIdx === currentWordIndex.value)
         return "word active-word flex items-center gap-1";
@@ -535,7 +539,7 @@ export default {
       getExtraCharacterClassName,
       displayExtraCharacter,
       wordsRef,
-      currentTime,
+      status,
       selectedMenuOption,
       status,
       word_constant,
@@ -551,12 +555,14 @@ export default {
 
 <style lang="scss" scoped>
 @import "../theme.scss";
-@keyframes fade-in-out {
+@keyframes expand {
   0% {
-    opacity: 1;
+    height: 0;
+    opacity: 0;
   }
   100% {
-    opacity: 0;
+    height: 2px;
+    opacity: 1;
   }
 }
 .counter {
@@ -568,14 +574,14 @@ export default {
       color: $Orchid;
       font-family: $Font;
       font-size: 40px;
-      font-weight: 400;
+      font-weight: light;
     }
   }
 }
 .words {
-  position: relative;
+  position: realtive;
   border-radius: 12px;
-  background: #f0f0f0;
+  // background: #F0F0F0;
   height: 210px;
   overflow: hidden;
   font-family: $Font;
@@ -604,7 +610,7 @@ export default {
           position: absolute;
           top: -5%;
           left: -60%;
-          animation: fade-in-out 1s infinite ease-in forwards;
+          animation: expand 1s infinite ease-out;
         }
       }
 
@@ -617,7 +623,7 @@ export default {
           position: absolute;
           top: -5%;
           right: 25%;
-          animation: fade-in-out 1s infinite ease-in forwards;
+          animation: expand 1s infinite ease-out;
         }
       }
       &.correct-char {
@@ -631,7 +637,7 @@ export default {
       }
     }
   }
-  #userInput {
+  #userinput {
     opacity: 0;
     position: absolute;
     z-index: 2;
