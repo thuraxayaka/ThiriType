@@ -1,83 +1,113 @@
 <template>
   <div class="lg:w-4/5 lg:mx-auto">
     <div className="mt-4">
-      <Header/>
+      <Header />
     </div>
-    <div class=" mx-auto mt-40 mb-10">
-        <Menu 
+    <div class="mx-auto mt-40 mb-10">
+      <Menu
         @getSelectedTime="handleSelectedTime"
         @getSelectedWord="handleSelectedWord"
         @getDifficulty="handleDifficulty"
         @getQuoteSelected="handleQuoteSelected"
         @getOptions="handleSelectedOption"
-        :symbol="stateStore.symbol" 
-        :number="stateStore.number" 
-        :selectedMenuOption="stateStore.selectedMenuOption" 
-        :time_constant="stateStore.time_constant" 
-        :word_constant="stateStore.word_constant"
-        :difficulty ="stateStore.difficulty"/>
+        :symbol="symbol"
+        :number="number"
+        :selectedMenuOption="selectedMenuOption"
+        :time_constant="time_constant"
+        :word_constant="word_constant"
+        :difficulty="difficulty"
+      />
     </div>
-    <div v-if="stateStore.status !== 'finished'">
-      <Typing/>
+    <div v-if="status !== 'finished'">
+      <Typing />
     </div>
     <div v-else>
-      <Stats/>
+      <Stats />
     </div>
   </div>
 </template>
 
 <script>
-import Header from '@/components/Header.vue';
-import Menu from '@/components/Menu.vue';
-import Typing from '@/components/Typing.vue';
-import Stats from '@/components/Stats.vue';
-import { useTypingStateStore } from '@/stores/store';
-import { watch } from 'vue';
+import Header from "@/components/Header.vue";
+import Menu from "@/components/Menu.vue";
+import Typing from "@/components/Typing.vue";
+import Stats from "@/components/Stats.vue";
+import { useTypingStore } from "@/stores/store";
+import { toRefs, watch } from "vue";
 export default {
-  name: 'HomeView',
-  components: {Header,Typing,Stats,Menu},
+  name: "HomeView",
+  components: { Header, Typing, Stats, Menu },
   setup() {
-    const stateStore = useTypingStateStore();
+    const typingStore = useTypingStore();
+    const {
+      number,
+      symbol,
+      difficulty,
+      selectedMenuOption,
+      word_constant,
+      time_constant,
+      status,
+    } = toRefs(typingStore);
 
     const handleSelectedTime = (data) => {
-        // stateStore.setSelectedMenu(data.option);
-        // stateStore.time_constant = data.time;
-        stateStore.$patch({time_constant: data.time,selectedMenuOption : 'time'})
-    }
+      typingStore.$patch({
+        time_constant: data.time,
+        selectedMenuOption: "time",
+      });
+    };
 
     const handleSelectedWord = (data) => {
-        // stateStore.setSelectedMenu(data.option);
-        // stateStore.word_constant = data.count;
-        stateStore.$patch({selectedMenuOption: 'word',word_constant : data.count})
-    }
+      typingStore.$patch({
+        selectedMenuOption: "word",
+        word_constant: data.count,
+      });
+    };
 
     const handleSelectedOption = (data) => {
-        // stateStore.number = data.number;
-        // stateStore.symbol = data.symbol;
-
-        stateStore.$patch({number: data.number,symbol: data.symbol});
-    }
+      typingStore.$patch({ number: data.number, symbol: data.symbol });
+    };
 
     const handleQuoteSelected = (data) => {
-        stateStore.$patch({selectedMenuOption: data});
-    }
+      typingStore.$patch({ selectedMenuOption: data });
+    };
 
     const handleDifficulty = (data) => {
-        // stateStore.setSelectedMenu(data.option);
-        // stateStore.difficulty = data.difficulty;
-        stateStore.$patch({selectedMenuOption: data.option,difficulty: data.difficulty});
-    }
+      typingStore.$patch({
+        selectedMenuOption: data.option,
+        difficulty: data.difficulty,
+      });
+    };
     const restart = () => {
-      stateStore.status = '';
-    }
-    watch([()=> stateStore.time_constant,() => stateStore.word_constant,() => stateStore.selectedMenuOption,
-      () => stateStore.symbol , () => stateStore.number, () =>  stateStore.difficulty
-    ],() => {
-          restart();
-    })
+      status.value = "";
+    };
+    watch(
+      [
+        () => time_constant.value,
+        () => word_constant.value,
+        () => selectedMenuOption.value,
+        () => symbol.value,
+        () => number.value,
+        () => difficulty.value,
+      ],
+      () => {
+        typingStore.restart();
+      }
+    );
 
-
-    return {stateStore,handleSelectedOption,handleSelectedTime,handleDifficulty,handleQuoteSelected,handleSelectedWord}
-  }
-}
+    return {
+      handleSelectedOption,
+      handleSelectedTime,
+      handleDifficulty,
+      handleQuoteSelected,
+      handleSelectedWord,
+      symbol,
+      number,
+      difficulty,
+      selectedMenuOption,
+      word_constant,
+      time_constant,
+      status,
+    };
+  },
+};
 </script>

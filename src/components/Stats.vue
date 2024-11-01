@@ -94,6 +94,9 @@ export default {
       testResult,
       timePassed,
       difficulty,
+      getErrorArr,
+      getRawArr,
+      getWpmArr,
       selectedMenuOption,
     } = toRefs(typingStore);
     const result = Object.values(testResult.value);
@@ -113,24 +116,25 @@ export default {
       datasets: [
         {
           type: "line",
-          data: typingStore.getWpmArr,
+          data: getWpmArr,
           label: "wpm",
           tension: 0.4,
           borderColor: "#9966CC",
         },
         {
           type: "line",
-          data: typingStore.getRawArr,
+          data: getRawArr,
           label: "raw",
           tension: 0.4,
           borderColor: "#FF69B4",
         },
         {
           type: "scatter",
-          data: typingStore.getErrorArr,
+          data: getErrorArr,
           label: "errors",
           backgroundColor: "rgb(255,0,0)",
           yAxisID: "y2",
+          xAxisID: "x",
           pointStyle: "crossRot",
           pointRadius: 4,
           pointBorderWidth: 2,
@@ -153,8 +157,11 @@ export default {
           grid: {
             color: "#E6E6FA",
           },
-          type: "category",
+          type: "linear",
           position: "bottom",
+          ticks: {
+            stepSize: 1,
+          },
         },
         y: {
           type: "linear",

@@ -51,9 +51,16 @@ export const useTypingStore = defineStore("typing-store", () => {
     return Object.values(testResult).map((res) => res.raw);
   });
   const getErrorArr = computed(() => {
-    return Object.values(testResult)
-      .map((res) => res.errors)
-      .filter((res) => res !== 0);
+    const keys = Object.keys(testResult);
+    const values = Object.values(testResult);
+    const errArr = [];
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (values[i].errors !== 0) {
+        const obj = { x: keys[i], y: values[i].errors };
+        errArr.push(obj);
+      }
+    }
+    return errArr;
   });
 
   const restart = () => {
