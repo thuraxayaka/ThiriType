@@ -2,6 +2,7 @@
 node_modules
 /dist
 .vscode-root/
+.idea
 
 # local env files
 .env.local
