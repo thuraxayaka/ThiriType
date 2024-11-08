@@ -5,11 +5,6 @@
     </div>
     <div class="mx-auto mt-40 mb-10">
       <Menu
-        @getSelectedTime="handleSelectedTime"
-        @getSelectedWord="handleSelectedWord"
-        @getDifficulty="handleDifficulty"
-        @getQuoteSelected="handleQuoteSelected"
-        @getOptions="handleSelectedOption"
         :symbol="symbol"
         :number="number"
         :selectedMenuOption="selectedMenuOption"
@@ -50,34 +45,6 @@ export default {
       status,
     } = toRefs(typingStore);
 
-    const handleSelectedTime = (data) => {
-      typingStore.$patch({
-        time_constant: data.time,
-        selectedMenuOption: "time",
-      });
-    };
-
-    const handleSelectedWord = (data) => {
-      typingStore.$patch({
-        selectedMenuOption: "word",
-        word_constant: data.count,
-      });
-    };
-
-    const handleSelectedOption = (data) => {
-      typingStore.$patch({ number: data.number, symbol: data.symbol });
-    };
-
-    const handleQuoteSelected = (data) => {
-      typingStore.$patch({ selectedMenuOption: data });
-    };
-
-    const handleDifficulty = (data) => {
-      typingStore.$patch({
-        selectedMenuOption: data.option,
-        difficulty: data.difficulty,
-      });
-    };
     const restart = () => {
       typingStore.restart();
     };
@@ -96,11 +63,6 @@ export default {
     );
 
     return {
-      handleSelectedOption,
-      handleSelectedTime,
-      handleDifficulty,
-      handleQuoteSelected,
-      handleSelectedWord,
       symbol,
       number,
       difficulty,

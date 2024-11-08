@@ -15,6 +15,7 @@ import {
   faStar,
   faHashtag,
   faArrowDown19,
+  faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Add icons to the library
@@ -26,7 +27,8 @@ library.add(
   faQuoteLeft,
   faStar,
   faHashtag,
-  faArrowDown19
+  faArrowDown19,
+  faCaretDown
 );
 const pinia = createPinia();
 const app = createApp(App);

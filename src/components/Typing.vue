@@ -26,13 +26,24 @@
         >{{ char }}</span
       >
     </div>
+
     <input
       v-model="userInput"
-      id="userinput"
+      id="userInput"
       type="text"
       ref="inputRef"
       @keydown="handleKeyDown"
       @keyup="handleKeyUp"
+    />
+  </div>
+  <div
+    v-show="status === 'started'"
+    class="flex items-center justify-center mt-12"
+  >
+    <font-awesome-icon
+      :icon="['fas', 'rotate-right']"
+      class="reset"
+      @click="restart"
     />
   </div>
 </template>
@@ -42,13 +53,16 @@ import { ref, reactive, watch, computed, onMounted, toRefs } from "vue";
 
 import Menu from "./Menu.vue";
 import { useTypingStore } from "@/stores/store.js";
-
+import { utils } from "@/utils/functions";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 export default {
   components: {
     Menu,
+    FontAwesomeIcon,
   },
   setup() {
     const typingStore = useTypingStore();
+    const { isObjectEmpty, clearAll } = utils;
     const {
       selectedMenuOption,
       status,
@@ -59,6 +73,7 @@ export default {
       number,
       difficulty,
       getWords,
+      completeChallenge,
     } = toRefs(typingStore);
     const userInput = ref("");
     const words = getWords;
@@ -73,7 +88,6 @@ export default {
     const rawKeyStroke = ref(0);
     let wpmHistory = reactive({});
     const prevErrorCount = ref(0);
-
     const shouldGenerateNewWords = ref(false);
     let charHistory = reactive({});
     let wordHistory = reactive({});
@@ -139,9 +153,18 @@ export default {
     });
 
     //watch
+
+    watch(shouldGenerateNewWords, (newValue) => {
+      if (newValue) {
+        typingStore.generateNewWords();
+        shouldGenerateNewWords.value = false;
+      }
+    });
     watch(currentWordIndex, (newIndex, oldIndex) => {
+      if (currentWordIndex.value === words.value.length - 10) {
+        shouldGenerateNewWords.value = true;
+      }
       if (currentWordIndex.value === words.value.length) {
-        finish();
         return;
       }
       if (status.value === "started") {
@@ -154,28 +177,46 @@ export default {
         }
       }
     });
-    watch(
-      [currentWordIndex, currentCharIndex],
-      ([newWordIndex, newCharIndex]) => {
-        if (selectedMenuOption.value === "word") {
-          const lastIndex = words.value.length - 1;
-          if (newWordIndex === lastIndex) {
-            const lastWord = words.value[lastIndex];
-            if (newCharIndex === lastWord.length - 1) {
-              finish();
-            }
+    const shouldStop = computed(() => {
+      if (difficulty.value === "master") {
+        if (
+          !isObjectEmpty(extraChars) ||
+          !Object.values(charHistory).every((isCorrect) => isCorrect)
+        ) {
+          completeChallenge.value = false;
+          return true;
+        }
+      } else if (difficulty.value === "hard") {
+        if (!isObjectEmpty(errorWords)) {
+          completeChallenge.value = false;
+          return true;
+        }
+      }
+      if (selectedMenuOption.value === "time") {
+        if (currentTime.value === 0) {
+          completeChallenge.value = true;
+          return true;
+        }
+      }
+      if (selectedMenuOption.value === "word") {
+        const lastIndex = words.value.length - 1;
+        if (currentWordIndex.value === lastIndex) {
+          const lastWord = words.value[lastIndex];
+          if (currentCharIndex.value === lastWord.length - 1) {
+            completeChallenge.value = true;
+            return true;
           }
         }
       }
-    );
+
+      return false;
+    });
 
     watch(currentTime, () => {
-      if (status.value === "started") {
-        if (wpmKeyStroke.value === 0) {
-          return;
-        }
-        calculateWpm();
+      if (wpmKeyStroke.value === 0) {
+        return;
       }
+      calculateWpm();
     });
 
     watch(
@@ -191,22 +232,25 @@ export default {
         restart();
       }
     );
-
-    watch(userInput, (newVal) => {
-      if (status.value === "finished") return;
-      wordHistory[currentWordIndex.value] = newVal.trim();
+    watch([charHistory, extraChars, userInput], () => {
+      if (shouldStop.value) finish();
     });
-    //methods
+    watch([userInput, currentTime], ([newInput]) => {
+      if (status.value === "finished") return;
+      wordHistory[currentWordIndex.value] = newInput.trim();
+    });
 
     const start = () => {
       if (status.value !== "started") typingStore.$patch({ status: "started" });
 
-      timerCounter();
+      startTimer();
     };
 
     const finish = () => {
       status.value = "finished";
       clearInterval(intervalId.value);
+      clearAll(typingStore.charStats);
+      clearAll(typingStore.testResult);
       Object.assign(typingStore.charStats, { ...charStats.value });
       Object.assign(typingStore.testResult, { ...wpmHistory });
     };
@@ -217,12 +261,13 @@ export default {
       currentWordIndex.value = 0;
       userInput.value = "";
       currentRef.value = null;
-      wordHistory = {};
-      charHistory = {};
-      correctWords = {};
-      errorWords = {};
-      extraChars = {};
-      wpmHistory = {};
+      clearAll(wordHistory);
+      clearAll(charHistory);
+      clearAll(correctWords);
+      clearAll(errorWords);
+      clearAll(extraChars);
+      clearAll(wpmHistory);
+
       if (typingStore.restart) {
         typingStore.restart();
       }
@@ -233,14 +278,10 @@ export default {
       focusInput();
     };
 
-    const timerCounter = () => {
+    const startTimer = () => {
       if (selectedMenuOption.value === "time") {
         currentTime.value = time_constant.value;
         intervalId.value = setInterval(() => {
-          if (currentTime.value === 0) {
-            finish();
-            return;
-          }
           currentTime.value--;
         }, 1000);
       } else if (selectedMenuOption.value === "word") {
@@ -259,6 +300,7 @@ export default {
         passingTime = currentTime.value;
       }
       if (passingTime === 0) return;
+
       typingStore.timePassed = passingTime;
       const totalCharTyped = Object.keys(charHistory).length;
       const raw = Math.floor(((totalCharTyped / 5) * 60) / passingTime);
@@ -334,13 +376,14 @@ export default {
       }
 
       //handle tabs key
-      if (keyCode == 9) {
+      if (keyCode === 9) {
         e.preventDefault();
         return;
       }
 
       //handle backspace
       if (keyCode === 8) {
+        // TODO: handle backspace
         const keyString = currentWordIndex.value + "." + currentCharIndex.value;
         let prevWord = wordHistory[currentWordIndex.value - 1] || "";
         if (currentCharIndex.value < 0) {
@@ -357,7 +400,6 @@ export default {
 
         currentCharIndex.value--;
         delete charHistory[keyString];
-
         currentChar.value = "";
         return;
       }
@@ -391,7 +433,7 @@ export default {
 
     const checkPrevWords = () => {
       wpmKeyStroke.value++;
-      const correctWord = words[currentWordIndex.value];
+      const correctWord = words.value[currentWordIndex.value];
       const userTypedWord = userInput.value.trim();
       const isCorrect = correctWord === userTypedWord;
       wordHistory[currentWordIndex.value] = userTypedWord;
@@ -447,6 +489,7 @@ export default {
         ) {
           return " char caret-right correct-char";
         }
+
         return "correct-char char";
       }
       if (charHistory[keyString] === false) {
@@ -510,6 +553,7 @@ export default {
         return extraWords.split("");
       }
     };
+
     return {
       userInput,
       words,
@@ -529,7 +573,6 @@ export default {
       getExtraCharacterClassName,
       displayExtraCharacter,
       wordsRef,
-      status,
       selectedMenuOption,
       status,
       word_constant,
@@ -538,6 +581,8 @@ export default {
       symbol,
       number,
       difficulty,
+      extraChars,
+      restart,
     };
   },
 };
@@ -547,12 +592,10 @@ export default {
 @import "../theme.scss";
 @keyframes expand {
   0% {
-    height: 0;
-    opacity: 0;
+    opacity: 1;
   }
   100% {
-    height: 2px;
-    opacity: 1;
+    opacity: 0.1;
   }
 }
 .counter {
@@ -564,14 +607,12 @@ export default {
       color: $Orchid;
       font-family: $Font;
       font-size: 40px;
-      font-weight: light;
+      font-weight: normal;
     }
   }
 }
 .words {
-  position: realtive;
   border-radius: 12px;
-  // background: #F0F0F0;
   height: 210px;
   overflow: hidden;
   font-family: $Font;
@@ -600,7 +641,7 @@ export default {
           position: absolute;
           top: -5%;
           left: -60%;
-          animation: expand 1s infinite ease-out;
+          animation: expand 0.8s infinite ease-in forwards;
         }
       }
 
@@ -613,7 +654,7 @@ export default {
           position: absolute;
           top: -5%;
           right: 25%;
-          animation: expand 1s infinite ease-out;
+          animation: expand 0.8s infinite ease-in forwards;
         }
       }
       &.correct-char {
@@ -627,10 +668,15 @@ export default {
       }
     }
   }
-  #userinput {
+  #userInput {
     opacity: 0;
     position: absolute;
     z-index: 2;
   }
+}
+.reset {
+  font-size: 2em;
+  color: $Orchid;
+  cursor: pointer;
 }
 </style>
