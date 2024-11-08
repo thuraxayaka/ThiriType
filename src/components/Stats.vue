@@ -19,8 +19,9 @@
           <div class="flex flex-col items-start">
             <span class="sm-title">test type</span>
             <span class="sm-text">{{ selectedMenuOption }}</span>
-            <span class="sm-text">{{ timePassed }}</span>
+            <span class="sm-text">{{ timePassed }}s</span>
             <span class="sm-text">{{ difficulty }}</span>
+            <span class="sm-text">{{ completeChallenge ? "" : "failed" }}</span>
           </div>
           <div class="flex flex-col items-center">
             <span class="sm-title">raw</span>
@@ -35,7 +36,7 @@
               correct/incorrect/missing/extra characters
             </span>
           </div>
-          <div class="flex flex-col items-center" title="helo world">
+          <div class="flex flex-col items-center">
             <span class="sm-title">time</span>
             <span class="lg-text">{{ timePassed }}s</span>
           </div>
@@ -98,16 +99,26 @@ export default {
       getRawArr,
       getWpmArr,
       selectedMenuOption,
+      completeChallenge,
     } = toRefs(typingStore);
     const result = Object.values(testResult.value);
-    const overallWpm = Math.floor(
-      result.map((res) => res.wpm).reduce((acc, value) => acc + value, 0) /
-        result.length
-    );
-    const overallRaw = Math.floor(
-      result.map((res) => res.raw).reduce((acc, value) => acc + value, 0) /
-        result.length
-    );
+
+    const overallWpm =
+      result.length > 0
+        ? Math.floor(
+            result
+              .map((res) => res.wpm)
+              .reduce((acc, value) => acc + value, 0) / result.length
+          )
+        : 0;
+    const overallRaw =
+      result.length > 0
+        ? Math.floor(
+            result
+              .map((res) => res.raw)
+              .reduce((acc, value) => acc + value, 0) / result.length
+          )
+        : 0;
 
     const { correct, incorrect, missing, extra, accuracy } = charStats.value;
     const data = reactive({
@@ -159,8 +170,9 @@ export default {
           },
           type: "linear",
           position: "bottom",
+          beginAtZero: false,
           ticks: {
-            stepSize: 1,
+            stepSize: 2,
           },
         },
         y: {
@@ -174,9 +186,6 @@ export default {
             text: "Words Per Minute",
           },
           beginAtZero: true,
-          ticks: {
-            stepSize: 10,
-          },
         },
         y2: {
           type: "linear",
@@ -215,6 +224,7 @@ export default {
       difficulty,
       selectedMenuOption,
       restart,
+      completeChallenge,
     };
   },
 };
@@ -255,7 +265,7 @@ export default {
   .tooltip {
     font-family: $Poppins;
     position: absolute;
-    top: -20%;
+    top: -45%;
     left: -100%;
     visibility: hidden;
     opacity: 0;

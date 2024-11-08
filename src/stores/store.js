@@ -12,12 +12,14 @@ export const useTypingStore = defineStore("typing-store", () => {
   });
   const timePassed = ref(0);
   const status = ref("");
+  const completeChallenge = ref(false);
   const words = reactive([]);
   const selectedMenuOption = ref("time");
   const symbol = ref(false);
   const number = ref(false);
   const time_constant = ref(30);
   const word_constant = ref(50);
+  const quote_constant = ref("short");
   const difficulty = ref("normal");
 
   const getWords = computed(() => {
@@ -39,6 +41,12 @@ export const useTypingStore = defineStore("typing-store", () => {
       return words;
     }
   });
+
+  const generateNewWords = () => {
+    words.push(
+      ...generateWords(200, number.value, symbol.value).map((word) => word.val)
+    );
+  };
   const getTimeArr = computed(() => {
     return Object.keys(testResult);
   });
@@ -79,6 +87,7 @@ export const useTypingStore = defineStore("typing-store", () => {
     getRawArr,
     getErrorArr,
     restart,
+    quote_constant,
     status,
     symbol,
     number,
@@ -88,5 +97,7 @@ export const useTypingStore = defineStore("typing-store", () => {
     selectedMenuOption,
     getWords,
     words,
+    completeChallenge,
+    generateNewWords,
   };
 });
