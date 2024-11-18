@@ -74,11 +74,11 @@
           'flex',
           'items-center',
           'gap-1',
-          selectedMenuOption === 'quote' ? 'active' : '',
+          selectedMenuOption === 'story' ? 'active' : '',
         ]"
-        @click="selectedQuote('select')"
+        @click="selectedStory('select')"
       >
-        <font-awesome-icon :icon="['fas', 'quote-left']" /> quotes
+        <font-awesome-icon :icon="['fas', 'quote-left']" /> story
       </span>
 
       <div class="dropdown menu-text flex items-center gap-1">
@@ -236,23 +236,23 @@
         'justify-center',
         'lg:gap-6',
         'sm:gap-4',
-        selectedMenuOption === 'quote' ? '' : 'hidden',
-        customQuoteBoxActive ? 'custom-box-active' : '',
+        selectedMenuOption === 'story' ? '' : 'hidden',
+        customStoryBoxActive ? 'custom-box-active' : '',
       ]"
     >
       <span
-        :class="['menu-text', options.quote === 1 ? 'active' : '']"
-        @click="handleOptions({ quote: 'short' })"
+        :class="['menu-text', options.story === 1 ? 'active' : '']"
+        @click="handleOptions({ story: 'short' })"
         >short</span
       >
       <span
-        :class="['menu-text', options.quote === 2 ? 'active' : '']"
-        @click="handleOptions({ quote: 'medium' })"
+        :class="['menu-text', options.story === 2 ? 'active' : '']"
+        @click="handleOptions({ story: 'medium' })"
         >medium</span
       >
       <span
-        :class="['menu-text', options.quote === 3 ? 'active' : '']"
-        @click="handleOptions({ quote: 'long' })"
+        :class="['menu-text', options.story === 3 ? 'active' : '']"
+        @click="handleOptions({ story: 'long' })"
         >long</span
       >
     </div>
@@ -269,7 +269,7 @@ export default {
     "getSelectedTime",
     "getSelectedWord",
     "getDifficulty",
-    "getQuoteSelected",
+    "getStorySelected",
     "getOptions",
   ],
   components: { FontAwesomeIcon },
@@ -283,12 +283,12 @@ export default {
       status,
       symbol,
       number,
-      quote_constant,
+      story_constant,
     } = toRefs(typingStore);
     const customWordBoxActive = ref(false);
     const customTimeBoxActive = ref(false);
-    const customQuoteBoxActive = ref(false);
-    const options = reactive({ time: 1, word: 1, quote: 1 });
+    const customStoryBoxActive = ref(false);
+    const options = reactive({ time: 1, word: 1, story: 1 });
     const dropdownActive = ref(false);
     const customWordInput = ref("");
     const customTimeInput = ref("");
@@ -327,12 +327,12 @@ export default {
       }
       word_constant.value = n;
     };
-    const selectedQuote = (q) => {
-      if (q === "select") {
-        selectedMenuOption.value = "quote";
+    const selectedStory = (s) => {
+      if (s === "select") {
+        selectedMenuOption.value = "story";
         return;
       }
-      quote_constant.value = q;
+      story_constant.value = s;
     };
     const handleOptionsSelect = (option) => {
       number.value = option.number;
@@ -364,7 +364,7 @@ export default {
     };
 
     const handleOptions = (data) => {
-      const { time, word, quote } = data;
+      const { time, word, story } = data;
       if (time) {
         switch (time) {
           case 30: {
@@ -414,20 +414,20 @@ export default {
           }
         }
       } else {
-        switch (quote) {
+        switch (story) {
           case "short": {
-            options.quote = 1;
-            selectedQuote(quote);
+            options.story = 1;
+            selectedStory(story);
             break;
           }
           case "medium": {
-            options.quote = 2;
-            selectedQuote(quote);
+            options.story = 2;
+            selectedStory(story);
             break;
           }
           case "long": {
-            options.quote = 3;
-            selectedQuote(quote);
+            options.story = 3;
+            selectedStory(story);
             break;
           }
         }
@@ -438,7 +438,7 @@ export default {
       handleOptions,
       customWordBoxActive,
       customTimeBoxActive,
-      customQuoteBoxActive,
+      customStoryBoxActive,
       dropdownActive,
       customWordInput,
       customTimeInput,
@@ -449,12 +449,13 @@ export default {
       handleTimeInput,
       selectedTime,
       selectedDifficulty,
-      selectedQuote,
+      selectedStory,
       selectedWord,
       handleOptionsSelect,
       difficulty,
       time_constant,
       word_constant,
+      story_constant,
       selectedMenuOption,
       status,
       symbol,

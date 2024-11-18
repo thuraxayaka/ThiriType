@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, reactive, computed } from "vue";
 import { generateWords } from "@/utils/GenerateWords";
+import generateStory from "@/utils/GenerateStories";
 export const useTypingStore = defineStore("typing-store", () => {
   let testResult = reactive({});
   const charStats = reactive({
@@ -19,7 +20,7 @@ export const useTypingStore = defineStore("typing-store", () => {
   const number = ref(false);
   const time_constant = ref(30);
   const word_constant = ref(50);
-  const quote_constant = ref("short");
+  const story_constant = ref("short");
   const difficulty = ref("normal");
 
   const getWords = computed(() => {
@@ -30,6 +31,17 @@ export const useTypingStore = defineStore("typing-store", () => {
           (word) => word.val
         )
       );
+      return words;
+    } else if (selectedMenuOption.value === "story") {
+      words.length = 0;
+      const { story } = generateStory(story_constant.value);
+
+      const wordsArr = [];
+      story.forEach((sentence) => {
+        wordsArr.push(...sentence.split(" "));
+      });
+
+      words.push(...wordsArr);
       return words;
     } else {
       words.length = 0;
@@ -87,7 +99,7 @@ export const useTypingStore = defineStore("typing-store", () => {
     getRawArr,
     getErrorArr,
     restart,
-    quote_constant,
+    story_constant,
     status,
     symbol,
     number,

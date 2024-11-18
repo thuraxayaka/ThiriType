@@ -1,9 +1,9 @@
 <template>
   <div class="lg:w-4/5 lg:mx-auto">
-    <div className="mt-4">
+    <div class="mt-2">
       <Header />
     </div>
-    <div class="mx-auto mt-40 mb-10">
+    <div class="mx-auto mt-10 mb-60">
       <Menu
         :symbol="symbol"
         :number="number"
@@ -42,6 +42,7 @@ export default {
       selectedMenuOption,
       word_constant,
       time_constant,
+      story_constant,
       status,
     } = toRefs(typingStore);
 
@@ -56,6 +57,7 @@ export default {
         () => symbol.value,
         () => number.value,
         () => difficulty.value,
+        () => story_constant.value,
       ],
       () => {
         restart();

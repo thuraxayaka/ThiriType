@@ -7,7 +7,7 @@
   >
     <span class="time">{{ formattedTime }}</span>
   </div>
-  <div class="words flex flex-wrap items-start gap-6" @click="focusInput">
+  <div class="words flex flex-wrap items-start gap-x-8" @click="focusInput">
     <div
       v-for="(word, idx) in words"
       :ref="(el) => (wordsRef[idx] = el)"
@@ -32,6 +32,7 @@
       id="userInput"
       type="text"
       ref="inputRef"
+      autocomplete="off"
       @keydown="handleKeyDown"
       @keyup="handleKeyUp"
     />
@@ -68,6 +69,7 @@ export default {
       status,
       word_constant,
       time_constant,
+      story_constant,
       timePassed,
       symbol,
       number,
@@ -161,8 +163,10 @@ export default {
       }
     });
     watch(currentWordIndex, (newIndex, oldIndex) => {
-      if (currentWordIndex.value === words.value.length - 10) {
-        shouldGenerateNewWords.value = true;
+      if (selectedMenuOption.value === "time") {
+        if (currentWordIndex.value === words.value.length - 10) {
+          shouldGenerateNewWords.value = true;
+        }
       }
       if (currentWordIndex.value === words.value.length) {
         return;
@@ -198,7 +202,10 @@ export default {
           return true;
         }
       }
-      if (selectedMenuOption.value === "word") {
+      if (
+        selectedMenuOption.value === "word" ||
+        selectedMenuOption.value === "story"
+      ) {
         const lastIndex = words.value.length - 1;
         if (currentWordIndex.value === lastIndex) {
           const lastWord = words.value[lastIndex];
@@ -225,6 +232,7 @@ export default {
         () => word_constant.value,
         () => selectedMenuOption.value,
         () => symbol.value,
+        () => story_constant.value,
         () => number.value,
         () => difficulty.value,
       ],
@@ -284,7 +292,10 @@ export default {
         intervalId.value = setInterval(() => {
           currentTime.value--;
         }, 1000);
-      } else if (selectedMenuOption.value === "word") {
+      } else if (
+        selectedMenuOption.value === "word" ||
+        selectedMenuOption.value === "story"
+      ) {
         currentTime.value = 0;
         intervalId.value = setInterval(() => {
           currentTime.value++;
@@ -296,7 +307,10 @@ export default {
       let passingTime;
       if (selectedMenuOption.value === "time") {
         passingTime = time_constant.value - currentTime.value;
-      } else if (selectedMenuOption.value === "word") {
+      } else if (
+        selectedMenuOption.value === "word" ||
+        selectedMenuOption.value === "story"
+      ) {
         passingTime = currentTime.value;
       }
       if (passingTime === 0) return;
@@ -335,7 +349,7 @@ export default {
       typingStore.$patch({ number: data.number, symbol: data.symbol });
     };
 
-    const handleQuoteSelected = (data) => {
+    const handleStorySelected = (data) => {
       typingStore.$patch({ selectedMenuOption: data });
     };
 
@@ -560,7 +574,7 @@ export default {
       formattedTime,
       charStats,
       handleDifficulty,
-      handleQuoteSelected,
+      handleStorySelected,
       handleSelectedOption,
       handleSelectedWord,
       handleSelectedTime,
@@ -613,16 +627,15 @@ export default {
 }
 .words {
   border-radius: 12px;
-  height: 210px;
+  height: 159px;
   overflow: hidden;
   font-family: $Font;
   font-size: 2em;
   padding: 20px;
-
   letter-spacing: -0.1em;
+
   .word {
     color: $Lilac;
-
     &.active-word {
       border-bottom: 1px solid $Amethyst;
     }
