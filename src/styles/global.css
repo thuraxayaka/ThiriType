@@ -1,0 +1,16 @@
+:root {
+  --border-radius: 6px;
+  --background-color: #e6e6fa;
+  --color: #da70d6;
+  --secondary-color: #f5f5f5;
+  --muted-color: #c8a2c8;
+  --active-color: #9966cc;
+  --error-color: #ff69b4;
+  --default-font: "Geist Mono", "Vazirmatn", monospace;
+  --secondary-font: "Poppins", "monospace", monospace;
+}
+body {
+  background: var(--background-color);
+}
+@import url("menu.css");
+@import url("typing.css");

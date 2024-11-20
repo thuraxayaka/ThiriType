@@ -1,11 +1,29 @@
 <template>
-  <div
-    :class="[
-      'counter',
-      status === 'started' && selectedMenuOption === 'time' ? 'active' : '',
-    ]"
-  >
-    <span class="time">{{ formattedTime }}</span>
+  <div class="flex items-center gap-6">
+    <div
+      :class="[
+        'counter',
+        status === 'started' && selectedMenuOption === 'time' ? 'active' : '',
+      ]"
+    >
+      <span class="time">{{ formattedTime }}</span>
+    </div>
+    <div
+      :class="[
+        'word-counter',
+        status === 'started' &&
+        (selectedMenuOption === 'word' || selectedMenuOption === 'story')
+          ? 'active'
+          : '',
+      ]"
+    >
+      <span class="word-count"
+        >{{ currentWordIndex + 1 }}/{{ words.length }}</span
+      >
+    </div>
+    <span :class="['capslock-btn', capslockOn ? 'active' : '']"
+      ><font-awesome-icon :icon="['fas', 'lock']" /> Capslock</span
+    >
   </div>
   <div class="words flex flex-wrap items-start gap-x-8" @click="focusInput">
     <div
@@ -85,6 +103,7 @@ export default {
     const currentRef = ref(null);
     const inputRef = ref(null);
     const wordsRef = reactive([]);
+    const capslockOn = ref(false);
 
     const wpmKeyStroke = ref(0);
     const rawKeyStroke = ref(0);
@@ -359,44 +378,44 @@ export default {
         difficulty: data.difficulty,
       });
     };
-
-    const handleKeyUp = (e) => {};
-
+    const handleKeyUp = (e) => {
+      capslockOn.value = e.getModifierState("CapsLock");
+    };
     const handleKeyDown = (e) => {
       if (status.value === "finished") {
         return;
       }
+      capslockOn.value = e.getModifierState("CapsLock");
       const key = e.key;
-      const keyCode = e.keyCode;
 
       if (status.value !== "started" && status.value !== "finished") {
         start();
       }
 
       //handle esc
-      if (keyCode === 27) {
+      if (key === "Escape") {
         return;
       }
 
       //disable capslock
-      if (keyCode === 20) {
+      if (key === "CapsLock") {
         e.preventDefault();
         return;
       }
       //disable shift alt ctrl
-      if (keyCode >= 16 && keyCode <= 18) {
+      if (key === "Shift" || key === "Alt" || key === "Control") {
         e.preventDefault();
         return;
       }
 
       //handle tabs key
-      if (keyCode === 9) {
+      if (key === "Tab") {
         e.preventDefault();
         return;
       }
 
       //handle backspace
-      if (keyCode === 8) {
+      if (key === "Backspace") {
         // TODO: handle backspace
         const keyString = currentWordIndex.value + "." + currentCharIndex.value;
         let prevWord = wordHistory[currentWordIndex.value - 1] || "";
@@ -419,7 +438,7 @@ export default {
       }
 
       //handle space
-      if (keyCode === 32) {
+      if (key === " ") {
         if (currentCharIndex.value === -1) {
           return;
         }
@@ -436,7 +455,7 @@ export default {
 
       if (status.value === "started") {
         rawKeyStroke.value++;
-        if (keyCode >= 65 && keyCode <= 90) {
+        if (/[0-9a-zA-Z]/.test(key)) {
           wpmKeyStroke.value++;
         }
       }
@@ -573,13 +592,14 @@ export default {
       words,
       formattedTime,
       charStats,
+      currentWordIndex,
       handleDifficulty,
       handleStorySelected,
       handleSelectedOption,
       handleSelectedWord,
       handleSelectedTime,
-      handleKeyUp,
       handleKeyDown,
+      handleKeyUp,
       inputRef,
       focusInput,
       getWordClassName,
@@ -597,99 +617,8 @@ export default {
       difficulty,
       extraChars,
       restart,
+      capslockOn,
     };
   },
 };
 </script>
-
-<style lang="scss" scoped>
-@import "../theme.scss";
-@keyframes expand {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.1;
-  }
-}
-.counter {
-  padding-left: 20px;
-  display: none;
-  &.active {
-    display: block;
-    .time {
-      color: $Orchid;
-      font-family: $Font;
-      font-size: 40px;
-      font-weight: normal;
-    }
-  }
-}
-.words {
-  border-radius: 12px;
-  height: 159px;
-  overflow: hidden;
-  font-family: $Font;
-  font-size: 2em;
-  padding: 20px;
-  letter-spacing: -0.1em;
-
-  .word {
-    color: $Lilac;
-    &.active-word {
-      border-bottom: 1px solid $Amethyst;
-    }
-    &.error-word {
-      border-bottom: 1px solid red;
-    }
-    .char {
-      position: relative;
-      &.caret-left {
-        display: inline-block;
-        &::before {
-          content: "|";
-          color: $DarkerOrchid;
-          width: 5px;
-          height: 5px;
-          position: absolute;
-          top: -5%;
-          left: -60%;
-          animation: expand 0.8s infinite ease-in forwards;
-        }
-      }
-
-      &.caret-right {
-        &::after {
-          content: "|";
-          width: 2px;
-          color: $DarkerOrchid;
-          height: 5px;
-          position: absolute;
-          top: -5%;
-          right: 25%;
-          animation: expand 0.8s infinite ease-in forwards;
-        }
-      }
-      &.correct-char {
-        color: $Amethyst;
-      }
-      &.error-char {
-        color: $HotPink;
-      }
-      &.extra-char {
-        color: $Magenta;
-      }
-    }
-  }
-  #userInput {
-    opacity: 0;
-    position: absolute;
-    z-index: 2;
-  }
-}
-.reset {
-  font-size: 2em;
-  color: $Orchid;
-  cursor: pointer;
-}
-</style>

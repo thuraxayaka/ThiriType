@@ -1,0 +1,107 @@
+.counter,
+.word-counter,
+.capslock-btn {
+  padding-left: 20px;
+  display: none;
+}
+.counter.active,
+.capslock-btn.active,
+.wrod-counter.active {
+  display: inline-block;
+}
+.counter.active .time {
+  color: var(--color);
+  font-family: var(--default-font);
+  font-size: 40px;
+  font-weight: normal;
+}
+
+.capslock-btn {
+  background: var(--active-color);
+  border-radius: var(--border-radius);
+  padding: 5px 10px;
+  color: var(--secondary-color);
+  line-height: 15px;
+  border-bottom: 3px solid rgba(0, 0, 0, 0.5);
+}
+
+.word-counter.active {
+  color: var(--color);
+  font-family: var(--default-font);
+  font-size: 30px;
+  font-weight: normal;
+}
+
+.words {
+  border-radius: var(--border-radius);
+  height: 150px;
+  overflow: hidden;
+  font-family: var(--default-font);
+  font-size: 2em;
+  letter-spacing: -0.1em;
+}
+
+.words .word {
+  color: var(--muted-color);
+}
+.words .word.active-word {
+  border-bottom: 1px solid var(--active-color);
+}
+.words .word.error-word {
+  border-bottom: 1px solid var(--error-color);
+}
+
+.word .char {
+  position: relative;
+}
+.word .char.caret-left {
+  display: inline-block;
+}
+.word .char.caret-left::before {
+  content: "|";
+  color: var(--active-color);
+  width: 5px;
+  height: 5px;
+  position: absolute;
+  top: -5%;
+  left: -60%;
+  animation: blink 0.8s infinite ease-in forwards;
+}
+.word .char.caret-right::after {
+  content: "|";
+  color: var(--active-color);
+  width: 5px;
+  height: 5px;
+  position: absolute;
+  top: -5%;
+  right: 0%;
+  animation: blink 0.8s infinite ease-in forwards;
+}
+.word .char.correct-char {
+  color: var(--active-color);
+}
+.word .char.error-char,
+.word .char.extra-char {
+  color: var(--error-color);
+}
+
+.words #userInput {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+}
+
+.reset {
+  font-size: 2em;
+  color: var(--color);
+  cursor: pointer;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}

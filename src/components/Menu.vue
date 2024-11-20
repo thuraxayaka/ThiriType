@@ -465,12 +465,12 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
+<!-- <style lang="scss" scoped>
 @import "../theme.scss";
 
 .menu {
   background: $Lilac;
-  border-radius: 15px;
+  border-radius: 5px;
   width: max-content;
   user-select: none;
   transition: border-radius 0.2s ease-in, opacity 0.4s ease-in;
@@ -683,4 +683,4 @@ export default {
     opacity: 0;
   }
 }
-</style>
+</style> -->

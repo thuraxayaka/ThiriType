@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
+import "@/styles/global.css";
 import "./index.css";
 import { library } from "@fortawesome/fontawesome-svg-core";
 
@@ -9,26 +10,27 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faScrewdriverWrench,
   faRotateRight,
-  faClock,
   faFont,
   faQuoteLeft,
   faStar,
   faHashtag,
   faArrowDown19,
   faCaretDown,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Add icons to the library
 library.add(
   faScrewdriverWrench,
   faRotateRight,
-  faClock,
+
   faFont,
   faQuoteLeft,
   faStar,
   faHashtag,
   faArrowDown19,
-  faCaretDown
+  faCaretDown,
+  faLock
 );
 const pinia = createPinia();
 const app = createApp(App);
