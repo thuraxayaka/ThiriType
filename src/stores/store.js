@@ -22,7 +22,7 @@ export const useTypingStore = defineStore("typing-store", () => {
   const word_constant = ref(50);
   const story_constant = ref("short");
   const difficulty = ref("normal");
-
+  const focus = ref(true);
   const getWords = computed(() => {
     if (selectedMenuOption.value === "word") {
       words.length = 0;
@@ -34,10 +34,11 @@ export const useTypingStore = defineStore("typing-store", () => {
       return words;
     } else if (selectedMenuOption.value === "story") {
       words.length = 0;
-      const { story } = generateStory(story_constant.value);
+
+      const data = generateStory(story_constant.value);
 
       const wordsArr = [];
-      story.forEach((sentence) => {
+      data?.story.forEach((sentence) => {
         wordsArr.push(...sentence.split(" "));
       });
 
@@ -53,7 +54,20 @@ export const useTypingStore = defineStore("typing-store", () => {
       return words;
     }
   });
-
+  const saveToLocalStorage = (data) => {
+    if (localStorage.getItem("user")) {
+      const prevData = JSON.parse(localStorage.getItem("user"));
+      const newData = { ...prevData, ...data };
+      localStorage.setItem("user", JSON.stringify(newData));
+    }
+    localStorage.setItem("user", JSON.stringify(data));
+  };
+  const retrieveFromLocalStorage = (props = null) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return;
+    if (user[props] !== undefined) return user[props];
+    return props;
+  };
   const generateNewWords = () => {
     words.push(
       ...generateWords(200, number.value, symbol.value).map((word) => word.val)
@@ -111,5 +125,8 @@ export const useTypingStore = defineStore("typing-store", () => {
     words,
     completeChallenge,
     generateNewWords,
+    saveToLocalStorage,
+    retrieveFromLocalStorage,
+    focus,
   };
 });

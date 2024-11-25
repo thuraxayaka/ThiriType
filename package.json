@@ -14,7 +14,8 @@
     "pinia": "^2.2.4",
     "vue": "^3.2.13",
     "vue-chartjs": "^5.3.1",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "word-list-json": "^0.2.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",

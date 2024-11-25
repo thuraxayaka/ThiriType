@@ -259,7 +259,6 @@
   </div>
 </template>
 <script>
-//TODO: handle custom input box not open
 import { useTypingStore } from "@/stores/store";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { ref, onMounted, toRefs, watch, reactive } from "vue";
@@ -288,6 +287,7 @@ export default {
     const customWordBoxActive = ref(false);
     const customTimeBoxActive = ref(false);
     const customStoryBoxActive = ref(false);
+
     const options = reactive({ time: 1, word: 1, story: 1 });
     const dropdownActive = ref(false);
     const customWordInput = ref("");
@@ -465,7 +465,7 @@ export default {
   },
 };
 </script>
-<!-- <style lang="scss" scoped>
+<style lang="scss" scoped>
 @import "../theme.scss";
 
 .menu {
@@ -541,27 +541,27 @@ export default {
 .timeOpt,
 .wordOpt,
 .symbolAndNum {
-  transition: width 0.4s ease-in, border-radius 0.4s ease-in;
-  -o-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
-  -moz-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
-  -webkit-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
+  // transition: width 0.4s ease-in, border-radius 0.4s ease-in;
+  // -o-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
+  // -moz-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
+  // -webkit-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
   opacity: 1;
   display: flex;
   padding: 10px 15px;
   overflow: hidden;
-  animation: appear 0.5s ease-in forwards;
-  -o-animation: appear 0.5s ease-in forwards;
-  -moz-animation: appear 0.5s ease-in forwards;
-  -webkit-animation: appear 0.5s ease-in forwards;
+  animation: appear 0.5s 0.7s ease-in forwards;
+  -o-animation: appear 0.5s 0.7s ease-in forwards;
+  -moz-animation: appear 0.5s 0.7s ease-in forwards;
+  -webkit-animation: appear 0.5s 0.7s ease-in forwards;
 
   .menu-text:hover {
     cursor: pointer;
   }
   &.hidden {
-    animation: disappear 0.5s ease-out forwards;
-    -o-animation: disappear 0.5s ease-out forwards;
-    -moz-animation: disappear 0.5s ease-out forwards;
-    -webkit-animation: disappear 0.5s ease-out forwards;
+    animation: disappear 0.7s ease-in-outforwards;
+    -o-animation: disappear 0.7s ease-in-out forwards;
+    -moz-animation: disappear 0.7s ease-in-out forwards;
+    -webkit-animation: disappear 0.7s ease-in-out forwards;
     opacity: 0;
     padding: 0;
     border-radius: 0;
@@ -621,32 +621,30 @@ export default {
 @-moz-keyframes appear {
   from {
     max-width: 0;
-    max-height: 0;
+    // max-height: 0;
   }
   to {
     max-width: 500px;
-    max-height: max-content;
+    // max-height: max-content;
   }
 }
 @keyframes appear {
   from {
     max-width: 0;
-    max-height: 0px;
+    // max-height: 0px;
   }
   to {
     max-width: 500px;
-    max-height: max-content;
+    // max-height: max-content;
   }
 }
 
 @keyframes disappear {
   to {
     max-width: 0;
-    height: auto;
   }
   from {
     max-width: 500px;
-    height: auto;
   }
 }
 @keyframes inputAppear {
@@ -683,4 +681,4 @@ export default {
     opacity: 0;
   }
 }
-</style> -->
+</style>

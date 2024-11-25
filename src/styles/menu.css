@@ -1,188 +1,92 @@
 .menu {
-  background: var(--active-color);
-  border-radius: 5px;
   width: max-content;
-  user-select: none;
-  transition: border-radius 0.2s ease-in, opacity 0.4s ease-in;
   color: var(--secondary-color);
-  font-family: var(--secondary-font);
-  font-size: 14px;
-  opacity: 0;
-}
-.menu.active {
-  opacity: 1;
-}
-.fixed-menu {
-  padding: 10px 15px;
-  width: max-content;
-}
-.fixed-menu .menu-text.active {
-  color: var(--error-color);
-  font-weight: bold;
-}
-.fixed-menu .menu-text:hover {
-  cursor: pointer;
-}
-.dropdown {
   position: relative;
-  z-index: 10;
 }
-.dropdown label {
-  cursor: pointer;
-}
-.dropdown .diff-opt {
+
+.menu .punctuationPanel,
+.timeOptions,
+.wordOptions,
+.storyOptions {
   overflow: hidden;
-  max-height: 0;
-  border: 5px solid var(--muted-color);
-  position: absolute;
-  top: 155%;
-  left: -50%;
-  width: 180px;
-  border-radius: 12px;
-  background: var(--muted-color);
-  text-align: center;
-  animation: dropdownAppear 0.6s ease-in forwards;
+  width: 190px;
+  white-space: nowrap;
+  background-color: var(--active-color);
+  transform-origin: right;
+  -webkit-transition: width 0.7s ease-out;
+  -moz-transition: width 0.7s ease-out;
+  -o-transition: width 0.7s ease-out;
+  transition: width 0.7s ease-out;
+  height: 35px;
+  padding: 0 10px;
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
 }
-.dropdown .diff-opt.hide {
-  animation: dropdownDisappear 0.4s linear forwards;
-}
-.dropdown .diff-opt .option {
-  border-radius: 5px;
-  padding: 10px 35px;
-  width: 100%;
-  transition: color 0.2s ease, background 0.2s ease;
-}
-.diff-opt .option.active {
-  background: var(--active-color);
-}
-.diff-opt .option.disabled {
-  user-select: none;
-  cursor: default;
-  padding: 10px 0;
-  font-size: 1em;
-  color: var(--secondary-color);
-}
-.diff-opt .option:not(.disabled):hover {
-  background: var(--secondary-color);
-  color: var(--color);
-}
-.timeOpt,
-.wordOpt,
-.symbolAndNum {
-  transition: width 0.4s ease-in, border-radius 0.4s ease-in;
-  -o-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
-  -moz-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
-  -webkit-transition: width 0.4s ease-in, border-radius 0.4s ease-in;
-  opacity: 1;
-  display: flex;
-  padding: 10px 15px;
-  overflow: hidden;
-  animation: appear 0.5s ease-in forwards;
-  -o-animation: appear 0.5s ease-in forwards;
-  -moz-animation: appear 0.5s ease-in forwards;
-  -webkit-animation: appear 0.5s ease-in forwards;
-}
-.timeOpt .menu-text:hover,
-.wordOpt .menu-text:hover,
-.symbolAndNum .menu-text:hover {
-  cursor: pointer;
-}
-.timeOpt.hidden,
-.wordOpt.hidden,
-.symbolAndNum.hidden {
-  animation: disappear 0.5s ease-out forwards;
-  -o-animation: disappear 0.5s ease-out forwards;
-  -moz-animation: disappear 0.5s ease-out forwards;
-  -webkit-animation: disappear 0.5s ease-out forwards;
-  opacity: 0;
+.menu .punctuationPanel.hidden,
+.timeOptions.hidden,
+.wordOptions.hidden,
+.storyOptions.hidden {
+  width: 0px;
   padding: 0;
+  display: flex !important;
+}
+
+.timeOptions,
+.wordOptions,
+.storyOptions {
+  width: max-content;
+  transform-origin: left;
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+.timeOptions .custom-box #timeInput,
+.wordOptions .custom-box #wordInput {
+  width: 0;
+  border-radius: var(--border-radius);
+  outline: none;
+  border: none;
+  padding: 0;
+  color: var(--active-color);
+  transform-origin: left;
+  -webkit-transition: width 0.7s ease-out;
+  -moz-transition: width 0.7s ease-out;
+  -o-transition: width 0.7s ease-out;
+  transition: width 0.7s ease-out;
+}
+.timeOptions .custom-box.active #timeInput,
+.wordOptions .custom-box.active #wordInput {
+  width: 80px;
+  padding-left: 10px;
+}
+
+.menuPanel {
+  background-color: var(--active-color);
+  height: 35px;
+  padding: 0 10px;
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
+}
+.menuPanel.active {
   border-radius: 0;
 }
-.timeOpt,
-.wordOpt,
-.difficultyOpt {
-  border-radius: 0 12px 12px 0;
+.menuPanel.active::before,
+.menuPanel::after {
+  content: "";
+  width: 5px;
+  height: 20px;
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
 }
 
-.timeOpt .menu-text.active,
-.wordOpt .menu-text.active,
-.difficultyOpt .menu-text.active,
-.symbolAndNum .menu-text.active {
+.menuPanel .text.active,
+.timeOptions .text.active,
+.wordOptions .text.active,
+.storyOptions .text.active,
+.punctuationPanel .text.active {
   color: var(--error-color);
-  font-weight: bold;
+  font-weight: bolder;
 }
-
-.symbolAndNum {
-  border-radius: 12px 0 0 12px;
-  margin-left: 12px;
-}
-
-.timeOpt.custom-box-active input,
-.wordOpt.custom-box-active input {
-  animation: inputAppear 0.2s linear forwards;
-  max-width: 120px;
-  height: auto;
-  padding-left: 5px;
-}
-.timeOpt input,
-.wordOpt input {
-  max-width: 0;
-  border: none;
-  outline: none;
-  color: var(--active-color);
-  border-radius: 2px 5px 5px 2px;
-  animation: inputDisappear 0.2s linear forwards;
-}
-.inline-spacer {
-  background: rgba(255, 255, 255, 0.24);
-  width: 8px;
-  height: 25px;
-  border-radius: 12px;
-}
-.inline-spacer.hidden {
-  display: none;
-}
-@keyframes disappear {
-  to {
-    max-width: 0;
-    height: auto;
-  }
-  from {
-    max-width: 500px;
-    height: auto;
-  }
-}
-@keyframes inputAppear {
-  from {
-    max-width: 0;
-  }
-  to {
-    max-width: 120px;
-  }
-}
-@keyframes inputDisappear {
-  from {
-    max-width: 120px;
-  }
-  to {
-    max-width: 0;
-  }
-}
-@keyframes dropdownAppear {
-  from {
-    max-height: 0;
-  }
-  to {
-    max-height: 200px;
-  }
-}
-@keyframes dropdownDisappear {
-  from {
-    max-height: 200px;
-    opacity: 1;
-  }
-  to {
-    max-height: 0;
-    opacity: 0;
-  }
+.menuPanel .text,
+.timeOptions .text,
+.wordOptions .text,
+.storyOptions .text,
+.punctuationPanel .text {
+  cursor: pointer;
 }

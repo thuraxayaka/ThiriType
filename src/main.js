@@ -17,20 +17,29 @@ import {
   faArrowDown19,
   faCaretDown,
   faLock,
+  faClock,
+  faDragon,
+  faArrowsToCircle,
+  faChevronLeft,
+  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Add icons to the library
 library.add(
   faScrewdriverWrench,
   faRotateRight,
-
+  faClock,
+  faDragon,
   faFont,
   faQuoteLeft,
   faStar,
   faHashtag,
   faArrowDown19,
   faCaretDown,
-  faLock
+  faLock,
+  faArrowsToCircle,
+  faChevronLeft,
+  faChevronRight
 );
 const pinia = createPinia();
 const app = createApp(App);

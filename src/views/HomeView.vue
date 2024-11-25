@@ -4,15 +4,9 @@
       <Header />
     </div>
     <div class="mx-auto mt-10 mb-60">
-      <Menu
-        :symbol="symbol"
-        :number="number"
-        :selectedMenuOption="selectedMenuOption"
-        :time_constant="time_constant"
-        :word_constant="word_constant"
-        :difficulty="difficulty"
-      />
+      <MenuV2 />
     </div>
+
     <div v-if="status !== 'finished'">
       <Typing />
     </div>
@@ -24,15 +18,16 @@
 
 <script>
 import Header from "@/components/Header.vue";
-import Menu from "@/components/Menu.vue";
+import MenuV2 from "@/components/MenuV2.vue";
 import Typing from "@/components/Typing.vue";
 import Stats from "@/components/Stats.vue";
+import TipsBox from "@/components/TipsBox.vue";
 import { useTypingStore } from "@/stores/store";
 import { toRefs, watch } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 export default {
   name: "HomeView",
-  components: { Header, Typing, Stats, Menu, FontAwesomeIcon },
+  components: { Header, Typing, Stats, FontAwesomeIcon, MenuV2, TipsBox },
   setup() {
     const typingStore = useTypingStore();
     const {
@@ -63,7 +58,6 @@ export default {
         restart();
       }
     );
-
     return {
       symbol,
       number,

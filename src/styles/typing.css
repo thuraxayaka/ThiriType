@@ -1,12 +1,11 @@
 .counter,
 .word-counter,
 .capslock-btn {
-  padding-left: 20px;
   display: none;
 }
 .counter.active,
 .capslock-btn.active,
-.wrod-counter.active {
+.word-counter.active {
   display: inline-block;
 }
 .counter.active .time {
@@ -39,6 +38,25 @@
   font-family: var(--default-font);
   font-size: 2em;
   letter-spacing: -0.1em;
+}
+
+.words-wrapper {
+  position: relative;
+  width: 100%;
+  height: max-content;
+}
+
+.words-wrapper .blur-screen {
+  position: absolute;
+  top: 0;
+  left: -1%;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+  color: var(--error-color);
+  font-size: 1.1em;
+  font-weight: bold;
 }
 
 .words .word {

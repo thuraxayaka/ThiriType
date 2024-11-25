@@ -25,35 +25,57 @@
       ><font-awesome-icon :icon="['fas', 'lock']" /> Capslock</span
     >
   </div>
-  <div class="words flex flex-wrap items-start gap-x-8" @click="focusInput">
+
+  <div class="words-wrapper">
     <div
-      v-for="(word, idx) in words"
-      :ref="(el) => (wordsRef[idx] = el)"
-      :key="`word.${idx}.${word}`"
-      :class="getWordClassName(word, idx)"
+      :class="[
+        'flex',
+        'items-center',
+        'justify-center',
+        'gap-2',
+        'blur-screen',
+        'cursor-pointer',
+        inputFocus ? 'hidden' : '',
+      ]"
+      @click="focusInput"
     >
-      <span
-        v-for="(char, i) in word"
-        :key="i"
-        :class="getCharacterClassName(word, idx, char, i)"
-        >{{ char }}</span
-      >
-      <span
-        v-for="(char, index) in displayExtraCharacter(word, idx)"
-        :class="getExtraCharacterClassName(idx, index, word)"
-        >{{ char }}</span
-      >
+      <font-awesome-icon :icon="['fas', 'arrows-to-circle']" />
+      <p>Click Here or Press Any Key To Continue</p>
     </div>
 
-    <input
-      v-model="userInput"
-      id="userInput"
-      type="text"
-      ref="inputRef"
-      autocomplete="off"
-      @keydown="handleKeyDown"
-      @keyup="handleKeyUp"
-    />
+    <div class="words flex flex-wrap items-start gap-x-8" @click="focusInput">
+      <div
+        v-for="(word, idx) in words"
+        :ref="(el) => (wordsRef[idx] = el)"
+        :key="`word.${idx}.${word}`"
+        :class="getWordClassName(word, idx)"
+      >
+        <span
+          v-for="(char, i) in word"
+          :key="i"
+          :class="getCharacterClassName(word, idx, char, i)"
+          >{{ char }}</span
+        >
+        <span
+          v-for="(char, index) in displayExtraCharacter(word, idx)"
+          :class="getExtraCharacterClassName(idx, index, word)"
+          >{{ char }}</span
+        >
+      </div>
+
+      <input
+        v-model="userInput"
+        id="userInput"
+        type="text"
+        ref="inputRef"
+        autocomplete="off"
+        @keydown="handleKeyDown"
+        @input="handleInputChange"
+        @keyup="handleKeyUp"
+        @blur="handleBlur"
+        @focusin="focusInput"
+      />
+    </div>
   </div>
   <div
     v-show="status === 'started'"
@@ -94,6 +116,7 @@ export default {
       difficulty,
       getWords,
       completeChallenge,
+      focus,
     } = toRefs(typingStore);
     const userInput = ref("");
     const words = getWords;
@@ -104,6 +127,7 @@ export default {
     const inputRef = ref(null);
     const wordsRef = reactive([]);
     const capslockOn = ref(false);
+    const inputFocus = ref(false);
 
     const wpmKeyStroke = ref(0);
     const rawKeyStroke = ref(0);
@@ -117,6 +141,7 @@ export default {
     let extraChars = reactive({});
 
     const intervalId = ref(null);
+    const timeoutId = ref(null);
     const currentTime = ref(null);
 
     onMounted(() => {
@@ -173,8 +198,19 @@ export default {
       };
     });
 
-    //watch
-
+    //watch;
+    watch(
+      /*check whether user focus is on any of input if so we remove global keydown listener
+       */
+      () => focus.value,
+      (newValue) => {
+        if (newValue === true) {
+          document.removeEventListener("keydown", focusInput);
+        } else {
+          document.addEventListener("keydown", focusInput);
+        }
+      }
+    );
     watch(shouldGenerateNewWords, (newValue) => {
       if (newValue) {
         typingStore.generateNewWords();
@@ -200,6 +236,7 @@ export default {
         }
       }
     });
+
     const shouldStop = computed(() => {
       if (difficulty.value === "master") {
         if (
@@ -216,6 +253,7 @@ export default {
         }
       }
       if (selectedMenuOption.value === "time") {
+        debugger;
         if (currentTime.value === 0) {
           completeChallenge.value = true;
           return true;
@@ -239,6 +277,7 @@ export default {
     });
 
     watch(currentTime, () => {
+      if (shouldStop.value === true) finish();
       if (wpmKeyStroke.value === 0) {
         return;
       }
@@ -263,13 +302,15 @@ export default {
       if (shouldStop.value) finish();
     });
     watch([userInput, currentTime], ([newInput]) => {
-      if (status.value === "finished") return;
+      if (status.value === "finished" || !status.value) {
+        userInput.value = "";
+        return;
+      }
       wordHistory[currentWordIndex.value] = newInput.trim();
     });
 
     const start = () => {
       if (status.value !== "started") typingStore.$patch({ status: "started" });
-
       startTimer();
     };
 
@@ -298,7 +339,7 @@ export default {
       if (typingStore.restart) {
         typingStore.restart();
       }
-
+      clearTimeout(timeoutId.value);
       clearInterval(intervalId.value);
       currentTime.value = null;
       wordsRef[0].scrollIntoView();
@@ -309,6 +350,7 @@ export default {
       if (selectedMenuOption.value === "time") {
         currentTime.value = time_constant.value;
         intervalId.value = setInterval(() => {
+          if (!inputFocus.value) return; //if not focused pause timer
           currentTime.value--;
         }, 1000);
       } else if (
@@ -317,6 +359,7 @@ export default {
       ) {
         currentTime.value = 0;
         intervalId.value = setInterval(() => {
+          if (!inputFocus.value) return; // if not focused pause timer
           currentTime.value++;
         }, 1000);
       }
@@ -385,6 +428,7 @@ export default {
       if (status.value === "finished") {
         return;
       }
+
       capslockOn.value = e.getModifierState("CapsLock");
       const key = e.key;
 
@@ -489,7 +533,17 @@ export default {
     };
 
     const focusInput = () => {
-      inputRef.value.focus();
+      focus.value = true;
+      inputFocus.value = true;
+      clearTimeout(timeoutId.value);
+      inputRef.value?.focus();
+    };
+
+    const handleBlur = () => {
+      focus.value = false;
+      timeoutId.value = setTimeout(() => {
+        inputFocus.value = false;
+      }, 1000);
     };
 
     const getWordClassName = (word, wordIdx) => {
@@ -618,6 +672,8 @@ export default {
       extraChars,
       restart,
       capslockOn,
+      inputFocus,
+      handleBlur,
     };
   },
 };

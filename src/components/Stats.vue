@@ -172,7 +172,9 @@ export default {
           position: "bottom",
           beginAtZero: false,
           ticks: {
-            stepSize: 2,
+            callback: (xValue) => {
+              return Number.isInteger(xValue) ? xValue : null;
+            },
           },
         },
         y: {

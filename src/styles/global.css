@@ -8,9 +8,12 @@
   --error-color: #ff69b4;
   --default-font: "Geist Mono", "Vazirmatn", monospace;
   --secondary-font: "Poppins", "monospace", monospace;
+  --common-padding: 5px 10px;
 }
 body {
   background: var(--background-color);
 }
+
 @import url("menu.css");
 @import url("typing.css");
+@import url("tipsbox.css");
