@@ -22,6 +22,12 @@ import {
   faArrowsToCircle,
   faChevronLeft,
   faChevronRight,
+  faCode,
+  faEnvelope,
+  faHouse,
+  faPalette,
+  faUserTie,
+  faGear,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Add icons to the library
@@ -33,8 +39,14 @@ library.add(
   faFont,
   faQuoteLeft,
   faStar,
+  faUserTie,
+  faGear,
+  faCode,
+  faPalette,
+  faEnvelope,
   faHashtag,
   faArrowDown19,
+  faHouse,
   faCaretDown,
   faLock,
   faArrowsToCircle,

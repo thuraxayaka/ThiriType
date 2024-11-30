@@ -106,6 +106,7 @@
             v-model="customTimeInput"
             :placeholder="time_constant"
             @focus="handleCustomInputFocus"
+            autocomplete="off"
             @keydown.enter="handleSelectedOption({ customTimeInput })"
             @blur="handleBlur"
           />
@@ -159,6 +160,7 @@
             :placeholder="word_constant"
             @focus="handleCustomInputFocus"
             @blur="handleBlur"
+            autocomplete="off"
             @keydown.enter="handleSelectedOption({ customWordInput })"
           />
         </div>

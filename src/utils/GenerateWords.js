@@ -1,8 +1,8 @@
-import wordList from "word-list-json";
+// import wordList from "word-list-json";
 import EnglishMostFrequentWords from "@/assets/EnglishMostFrequent.json";
 import { generateRandomNumber } from "./generateRand";
 const generateWords = (count, number, symbol) => {
-  console.log(wordList);
+  //   console.log(wordList);
   const wordsArray = [];
   for (let i = 0; i < count; i++) {
     const rand = generateRandomNumber(0, 550);

@@ -1,0 +1,23 @@
+header {
+  color: var(--color);
+  padding: 0 0 0 10px;
+  border-radius: 12px;
+}
+header #logo {
+  width: 170px;
+  height: 120px;
+  object-fit: cover;
+}
+header .menu-links .nav-item {
+  height: 100%;
+  padding: 12px 10px;
+  transition: transform 0.4s, color 0.2s;
+  font-family: var(--default-font);
+}
+header .menu-links .nav-item.active {
+  color: var(--error-color);
+}
+header .menu-links .nav-item:hover {
+  transform: scaleX(1.05);
+  color: var(--error-color);
+}

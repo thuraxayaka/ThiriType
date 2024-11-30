@@ -1,0 +1,56 @@
+.stats .big-text {
+  font-family: var(--secondary-font);
+  font-size: 1.5em;
+  color: var(--inactive-color);
+}
+.stats .ultra-big-text {
+  font-family: var(--secondary-font);
+  font-size: 4em;
+  color: var(--active-color);
+}
+.stats .sm-title {
+  font-family: var(--secondary-font);
+  font-size: 1.1em;
+  color: var(--color);
+}
+.stats .sm-text {
+  font-family: var(--secondary-font);
+  font-size: 1em;
+  color: var(--active-color);
+  font-weight: bold;
+}
+.stats {
+  font-family: var(--secondary-font);
+}
+.stats .lg-text {
+  font-family: var(--secondary-font);
+  font-size: 1.6em;
+  color: var(--active-color);
+  font-weight: 500;
+}
+.stats .characters {
+  position: relative;
+}
+.stats .characters .tooltip {
+  position: absolute;
+  top: -45%;
+  left: -100%;
+  visibility: hidden;
+  opacity: 0;
+  width: 380px;
+  transition: all 0.6s ease-out;
+  background: var(--secondary-background-color);
+  color: var(--color);
+  padding: var(--common-padding);
+  text-align: center;
+  user-select: none;
+}
+.stats .characters:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+.reset {
+  font-size: 2em;
+  color: var(--active-color);
+  cursor: pointer;
+}

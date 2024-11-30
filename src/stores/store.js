@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { generateWords } from "@/utils/GenerateWords";
 import generateStory from "@/utils/GenerateStories";
 export const useTypingStore = defineStore("typing-store", () => {
@@ -23,6 +23,12 @@ export const useTypingStore = defineStore("typing-store", () => {
   const story_constant = ref("short");
   const difficulty = ref("normal");
   const focus = ref(true);
+  const theme = ref("Lavender Twilight");
+
+  onMounted(() => {
+    const localTheme = retrieveFromLocalStorage("theme");
+    theme.value = localTheme || "Lavender Twilight";
+  });
   const getWords = computed(() => {
     if (selectedMenuOption.value === "word") {
       words.length = 0;
@@ -103,6 +109,14 @@ export const useTypingStore = defineStore("typing-store", () => {
     timePassed.value = 0;
     status.value = "";
   };
+  const toKebabCase = (str) => {
+    return str.toLowerCase().split(" ").join("-");
+  };
+  const changeTheme = () => {
+    document.body.className = "";
+    document.body.classList.add(toKebabCase(theme.value));
+    saveToLocalStorage({ theme: theme.value });
+  };
 
   return {
     testResult,
@@ -128,5 +142,7 @@ export const useTypingStore = defineStore("typing-store", () => {
     saveToLocalStorage,
     retrieveFromLocalStorage,
     focus,
+    theme,
+    changeTheme,
   };
 });

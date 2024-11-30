@@ -1,6 +1,6 @@
 .menu {
   width: max-content;
-  color: var(--secondary-color);
+  color: var(--color);
   position: relative;
 }
 
@@ -11,7 +11,7 @@
   overflow: hidden;
   width: 190px;
   white-space: nowrap;
-  background-color: var(--active-color);
+  background-color: var(--secondary-background-color);
   transform-origin: right;
   -webkit-transition: width 0.7s ease-out;
   -moz-transition: width 0.7s ease-out;
@@ -44,12 +44,13 @@
   outline: none;
   border: none;
   padding: 0;
-  color: var(--active-color);
+  color: var(--color);
   transform-origin: left;
   -webkit-transition: width 0.7s ease-out;
   -moz-transition: width 0.7s ease-out;
   -o-transition: width 0.7s ease-out;
   transition: width 0.7s ease-out;
+  background-color: var(--background-color);
 }
 .timeOptions .custom-box.active #timeInput,
 .wordOptions .custom-box.active #wordInput {
@@ -58,7 +59,7 @@
 }
 
 .menuPanel {
-  background-color: var(--active-color);
+  background-color: var(--secondary-background-color);
   height: 35px;
   padding: 0 10px;
   border-radius: var(--border-radius) 0 0 var(--border-radius);
@@ -80,13 +81,13 @@
 .wordOptions .text.active,
 .storyOptions .text.active,
 .punctuationPanel .text.active {
-  color: var(--error-color);
-  font-weight: bolder;
+  color: var(--active-color);
+  font-weight: light;
 }
-.menuPanel .text,
-.timeOptions .text,
-.wordOptions .text,
-.storyOptions .text,
-.punctuationPanel .text {
+.menuPanel .text:hover,
+.timeOptions .text:hover,
+.wordOptions .text:hover,
+.storyOptions .text:hover,
+.punctuationPanel .text:hover {
   cursor: pointer;
 }

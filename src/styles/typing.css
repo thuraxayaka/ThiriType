@@ -9,7 +9,7 @@
   display: inline-block;
 }
 .counter.active .time {
-  color: var(--color);
+  color: var(--active-color);
   font-family: var(--default-font);
   font-size: 40px;
   font-weight: normal;
@@ -19,7 +19,7 @@
   background: var(--active-color);
   border-radius: var(--border-radius);
   padding: 5px 10px;
-  color: var(--secondary-color);
+  color: var(--secondary-background-color);
   line-height: 15px;
   border-bottom: 3px solid rgba(0, 0, 0, 0.5);
 }
@@ -54,13 +54,13 @@
   bottom: 0;
   z-index: 1;
   backdrop-filter: blur(10px);
-  color: var(--error-color);
-  font-size: 1.1em;
-  font-weight: bold;
+  color: var(--color);
+  font-size: 1.05em;
+  /* font-weight: bold; */
 }
 
 .words .word {
-  color: var(--muted-color);
+  color: var(--inactive-color);
 }
 .words .word.active-word {
   border-bottom: 1px solid var(--active-color);

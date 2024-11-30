@@ -1,9 +1,9 @@
 :root {
   --border-radius: 6px;
   --background-color: #e6e6fa;
+  --secondary-background-color: #f5f5f5;
   --color: #da70d6;
-  --secondary-color: #f5f5f5;
-  --muted-color: #c8a2c8;
+  --inactive-color: #c8a2c8;
   --active-color: #9966cc;
   --error-color: #ff69b4;
   --default-font: "Geist Mono", "Vazirmatn", monospace;
@@ -11,9 +11,46 @@
   --common-padding: 5px 10px;
 }
 body {
+  transition: background-color 0.4s ease;
+}
+body.lavender-twilight {
+  --background-color: #e6e6fa;
+  --secondary-background-color: #f5f5f5;
+  --color: #da70d6;
+  --inactive-color: #c8a2c8;
+  --active-color: #9966cc;
+  --error-color: #ff69b4;
+}
+body.tokyo-night {
+  --background-color: #1f2335;
+  --secondary-background-color: #292e42;
+  --inactive-color: #a9b1d6;
+  --color: #b4f9f8;
+  --active-color: #7aa2f7;
+  --error-color: #ff007c;
+}
+body.outrun {
+  --background-color: #241734;
+  --secondary-background-color: #2e2157;
+  --active-color: #00f3ff;
+  --color: #fd3777;
+  --error-color: #fd1d53;
+  --inactive-color: #fd3777;
+}
+body.cyberpunk-2077 {
+  --background-color: #fdf500;
+  --secondary-background-color: #272932;
+  --color: #cb1dcd;
+  --active-color: #37ebf3;
+  --inactive-color: #e455ae;
+  --error-color: #710000;
+}
+body {
   background: var(--background-color);
 }
-
+@import url("header.css");
 @import url("menu.css");
 @import url("typing.css");
 @import url("tipsbox.css");
+@import url("stats.css");
+@import url("footer.css");

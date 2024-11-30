@@ -4,7 +4,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background-color: var(--secondary-color);
+  background-color: var(--secondary-background-color);
   border-radius: var(--border-radius);
   color: var(--active-color);
   font-family: var(--default-font);
@@ -15,7 +15,7 @@
 }
 .tips-box .inner-box .confirm-button {
   background-color: var(--active-color);
-  color: var(--secondary-color);
+  color: var(--secondary-background-color);
   padding: var(--common-padding);
   border-radius: var(--border-radius);
   width: max-content;
@@ -25,7 +25,7 @@
 }
 .tips-box .inner-box .confirm-button:hover {
   background: var(--error-color);
-  color: var(--secondary-color);
+  color: var(--secondary-background-color);
 }
 
 .tips-box .inner-box::before {
@@ -38,5 +38,6 @@
   right: 0;
   bottom: auto;
   border: 15px solid;
-  border-color: transparent transparent transparent var(--secondary-color);
+  border-color: transparent transparent transparent
+    var(--secondary-background-color);
 }

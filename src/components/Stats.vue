@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-4 mx-auto">
+  <div class="stats flex gap-4 mx-auto">
     <div class="flex flex-col gap-2 w-[10%]">
       <div class="flex flex-col gap-1">
         <span class="big-text">WPM</span>
@@ -100,6 +100,7 @@ export default {
       getWpmArr,
       selectedMenuOption,
       completeChallenge,
+      theme,
     } = toRefs(typingStore);
     const result = Object.values(testResult.value);
 
@@ -137,7 +138,7 @@ export default {
           data: getRawArr,
           label: "raw",
           tension: 0.4,
-          borderColor: "#FF69B4",
+          borderColor: "#ff007c",
         },
         {
           type: "scatter",
@@ -166,7 +167,8 @@ export default {
       scales: {
         x: {
           grid: {
-            color: "#E6E6FA",
+            color:
+              theme.value === "Lavender Twilight" ? "#f7f7f7" : "#f7f7f720",
           },
           type: "linear",
           position: "bottom",
@@ -181,7 +183,8 @@ export default {
           type: "linear",
           position: "left",
           grid: {
-            color: "#E6E6FA",
+            color:
+              theme.value === "Lavender Twilight" ? "#f7f7f7" : "#f7f7f720",
           },
           title: {
             display: true,
@@ -233,63 +236,4 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "../theme.scss";
-.big-text {
-  font-family: $Poppins;
-  font-size: 1.5em;
-  color: $Lilac;
-}
-.ultra-big-text {
-  font-family: $Poppins;
-  font-size: 4em;
-  color: $Orchid;
-}
-.sm-title {
-  font-family: $Poppins;
-  font-size: 1.1em;
-  color: $Lilac;
-}
-.sm-text {
-  font-family: $Poppins;
-  font-size: 1em;
-  color: $Orchid;
-  font-weight: bold;
-}
-
-.lg-text {
-  font-family: $Poppins;
-  font-size: 1.6em;
-  color: $Orchid;
-  font-weight: 500;
-}
-
-.characters {
-  position: relative;
-  .tooltip {
-    font-family: $Poppins;
-    position: absolute;
-    top: -45%;
-    left: -100%;
-    visibility: hidden;
-    opacity: 0;
-    width: 380px;
-    transition: all 0.6s ease-out;
-    background: $Rose;
-    color: $HotPink;
-    padding: 5px;
-    text-align: center;
-    user-select: none;
-  }
-
-  &:hover {
-    .tooltip {
-      opacity: 1;
-      visibility: visible;
-    }
-  }
-}
-.reset {
-  font-size: 2em;
-  color: $Orchid;
-  cursor: pointer;
-}
 </style>
